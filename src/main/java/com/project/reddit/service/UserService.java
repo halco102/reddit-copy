@@ -77,6 +77,10 @@ public class UserService {
     }
 
     public User getUserById(Long id) {
+
+        if (id == null) {
+            throw new NotFoundException("The user with id: " + id + " cannot be found");
+        }
         var user = this.userRepository.findById(id);
         return user.orElseThrow(() -> {throw new NotFoundException("The user with id: " + id + " does not exist");});
     }

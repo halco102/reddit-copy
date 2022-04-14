@@ -3,6 +3,8 @@ package com.project.reddit.service;
 import com.project.reddit.dto.post.PostDto;
 import com.project.reddit.dto.post.PostRequestDto;
 import com.project.reddit.dto.post.PostResponseDto;
+import com.project.reddit.exception.BadRequestException;
+import com.project.reddit.exception.NotFoundException;
 import com.project.reddit.mapper.PostMapper;
 import com.project.reddit.model.content.Post;
 import com.project.reddit.repository.PostRepository;
@@ -24,41 +26,46 @@ public class PostService {
 
     public PostResponseDto savePost(PostRequestDto requestDto) {
 
-        var user = userService.getUserById(requestDto.getUserId());
+        var getUserById = userService.getUserById(requestDto.getUserId());
         Post post = postMapper.toEntity(requestDto);
 
-        if (user == null) {
-            log.info("No user shutdown");
-            return null;
-        }
-
         post.setAllowComments(requestDto.isAllowComment());
-        post.setUser(user);
+        post.setUser(getUserById);
 
         var savedPost = this.postRepository.save(post);
-
+        log.info("Post is saved " + savedPost);
         return postMapper.postResponse(savedPost);
     }
 
     public List<PostDto> getAllPosts() {
-        var posts = this.postRepository.findAll();
+        var getPosts = this.postRepository.findAll();
 
-        if (posts.isEmpty()) {
+        if (getPosts.isEmpty()) {
             log.info("No posts");
-            return null;
+            throw new NotFoundException("Cannot find any posts");
         }
 
-        var temp = posts.stream().map(e -> postMapper.toPostDto(e)).collect(Collectors.toList());
-        return temp;
+        var posts = getPosts.stream().map(e -> postMapper.toPostDto(e)).collect(Collectors.toList());
+        return posts;
     }
 
     public Post findPostById(Long id) {
-        return this.postRepository.findById(id).orElse(null);
+        return this.postRepository.findById(id).orElseThrow(
+                () -> {throw new NotFoundException("The post of id: " + id + " cannot be found");});
     }
 
     public PostDto getPostDtoById(Long id) {
-        var test1 =  this.postMapper.toPostDto(this.postRepository.findById(id).get());
-        return test1;
+
+        if (id == null) {
+            throw new BadRequestException("The id is null");
+        }
+        var getPostById =  postRepository.findById(id);
+
+        if(getPostById.isEmpty()) {
+            throw new NotFoundException("The post of id: " + id + " cannot be found");
+        }
+
+        return postMapper.toPostDto(getPostById.get());
     }
 
 }

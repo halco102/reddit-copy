@@ -32,8 +32,4 @@ public class PostController {
         return new ResponseEntity<>(this.postService.getPostDtoById(id), HttpStatus.OK);
     }
 
-    @GetMapping("/test")
-    public ResponseEntity<?> test() {
-        return new ResponseEntity<>(this.postRepository.findAll(), HttpStatus.OK);
-    }
 }
