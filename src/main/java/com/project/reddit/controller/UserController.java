@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RequestMapping("/api/v1/user")
 @RestController
 @RequiredArgsConstructor
@@ -16,7 +18,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping()
-    public ResponseEntity<?> signupUser(@RequestBody UserSignupRequestDto signupRequestDto) {
+    public ResponseEntity<?> signupUser(@RequestBody @Valid UserSignupRequestDto signupRequestDto) {
         return new ResponseEntity<>(this.userService.signupUser(signupRequestDto), HttpStatus.OK);
     }
 
@@ -26,7 +28,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> userLogin(@RequestBody UserLoginRequestDto dto) {
+    public ResponseEntity<?> userLogin(@RequestBody @Valid UserLoginRequestDto dto) {
         return new ResponseEntity<>(this.userService.userLogin(dto), HttpStatus.OK);
     }
 
