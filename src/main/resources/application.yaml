@@ -1,0 +1,47 @@
+app:
+  version: 1.0.0
+logging:
+  level:
+    org.springframework.web: DEBUG
+spring:
+  h2:
+    console:
+      enabled: true
+      path: /h2
+
+  datasource:
+    #postgres
+    #url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    #driver-class-name: org.postgresql.Driver
+    #platform: postgres
+    #username: ${DB_USERNAME}
+    #password: ${DB_PASSWORD}
+    #end postgres conf
+
+    #h2
+    url: jdbc:h2:mem:testReditDB;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;
+    username: sa
+    password: password
+    driverClassName: org.h2.Driver
+    #end h2 datasource conf
+  flyway:
+    enabled: false
+    user: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    locations: classpath:db/migration
+    check-location: true
+    baseline-on-migrate: false
+    driverClassName: org.postgresql.Driver
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant-path-matcher
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQL92Dialect
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: none
