@@ -40,9 +40,8 @@ public class PostService {
     public List<PostDto> getAllPosts() {
         var getPosts = this.postRepository.findAll();
 
-        if (getPosts.isEmpty()) {
-            log.info("No posts");
-            throw new NotFoundException("Cannot find any posts");
+        if (getPosts == null) {
+            throw new NotFoundException("Posts list is null");
         }
 
         var posts = getPosts.stream().map(e -> postMapper.toPostDto(e)).collect(Collectors.toList());
@@ -66,6 +65,20 @@ public class PostService {
         }
 
         return postMapper.toPostDto(getPostById.get());
+    }
+
+    public List<PostDto> getSimilarPostsByTitle(String title) {
+
+        if (title == null || title.isBlank()) {
+            throw new BadRequestException("The title is eather null or empty");
+        }
+        var listOfPosts = this.postRepository.getPostsByTitle(title);
+
+        if(listOfPosts == null) {
+            throw new NotFoundException("The post list is null");
+        }
+
+        return listOfPosts.stream().map(e -> postMapper.toPostDto(e)).collect(Collectors.toList());
     }
 
 }
