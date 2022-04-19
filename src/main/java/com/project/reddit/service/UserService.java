@@ -87,13 +87,13 @@ public class UserService {
 
     public BasicUserInfo userLogin(UserLoginRequestDto requestDto) {
 
-        var getUserByEmail = this.userRepository.getUserByEmail(requestDto.getEmail());
+        var getUserByEmail = this.userRepository.getUserByEmail(requestDto.getEmail().trim());
 
         if(getUserByEmail.isEmpty()){
-            throw new NotFoundException("The user with email: " + requestDto.getEmail() + " does not exist");
+            throw new NotFoundException("The user with email: " + requestDto.getEmail().trim() + " does not exist");
         }
 
-        if (getUserByEmail.get().getPassword().matches(requestDto.getPassword())) {
+        if (getUserByEmail.get().getPassword().matches(requestDto.getPassword().trim())) {
             log.info("Password match");
             return userMapper.fromEntityToBasicUserInfoDto(getUserByEmail.get());
         }else {
