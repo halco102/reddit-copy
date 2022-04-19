@@ -22,7 +22,6 @@ public class PostRequestDto {
     private String imageUrl;
 
     @NotNull
-    @NotBlank
     private Long userId;
 
     private boolean allowComment;
