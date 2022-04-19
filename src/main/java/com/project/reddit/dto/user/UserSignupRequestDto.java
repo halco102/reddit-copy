@@ -9,6 +9,7 @@ import org.hibernate.validator.constraints.Range;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Data
 @NoArgsConstructor
@@ -17,12 +18,12 @@ public class UserSignupRequestDto {
 
     @NotNull
     @NotBlank
-    @Range(min = 3, max = 30)
+    @Size(min = 3, max = 30)
     private String username;
 
     @NotBlank
     @NotNull
-    @Range(min = 8, max = 30)
+    @Size(min = 8, max = 30)
     private String password;
 
     @NotNull
