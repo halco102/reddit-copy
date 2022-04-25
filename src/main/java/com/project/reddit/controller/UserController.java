@@ -2,6 +2,7 @@ package com.project.reddit.controller;
 
 import com.project.reddit.dto.user.UserLoginRequestDto;
 import com.project.reddit.dto.user.UserSignupRequestDto;
+import com.project.reddit.repository.UserRepository;
 import com.project.reddit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,8 @@ import javax.validation.Valid;
 public class UserController {
 
     private final UserService userService;
+
+
 
     @PostMapping()
     public ResponseEntity<?> signupUser(@RequestBody @Valid UserSignupRequestDto signupRequestDto) {

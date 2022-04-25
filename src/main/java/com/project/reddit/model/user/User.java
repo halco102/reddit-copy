@@ -7,6 +7,8 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.project.reddit.model.content.Post;
 import com.project.reddit.model.message.Comment;
+import com.project.reddit.model.message.CommentLikeDislike;
+import com.project.reddit.model.message.EmbedableCommentLikeDislikeId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,6 +40,9 @@ public class User {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "roles")
+    private UserRole userRole;
+
     @Column(name = "created_at")
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
@@ -54,12 +59,17 @@ public class User {
     @JsonIgnore
     private List<Comment> comments;
 
-    public User(Long id, String username, String password, String email, LocalDate createdAt, String imageUrl) {
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<CommentLikeDislike> likeDislikes;
+
+
+    public User(Long id, String username, String password, String email, LocalDate createdAt, String imageUrl, UserRole role) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.email = email;
         this.createdAt = createdAt;
         this.imageUrl = imageUrl;
+        this.userRole = role;
     }
 }

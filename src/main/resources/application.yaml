@@ -47,3 +47,4 @@ spring:
       ddl-auto: none
 
 cloudinary-api-key: ${CLOUDINARY_API_KEY}
+jwt-secret-key: ${JWT_SECRET_KEY}
