@@ -1,17 +1,19 @@
 package com.project.reddit.service;
 
-import com.project.reddit.dto.comment.CommentDto;
-import com.project.reddit.dto.comment.CommentRequest;
-import com.project.reddit.dto.comment.EditCommentDto;
+import com.project.reddit.dto.comment.*;
 import com.project.reddit.exception.NotFoundException;
 import com.project.reddit.mapper.CommentMapper;
 import com.project.reddit.model.message.Comment;
+import com.project.reddit.model.message.CommentLikeDislike;
+import com.project.reddit.model.message.EmbedableCommentLikeDislikeId;
 import com.project.reddit.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,6 +75,41 @@ public class CommentService {
         }
 
         return getAllCommentsFromDb.stream().map(e -> this.commentMapper.toDto(e)).collect(Collectors.toList());
+    }
+
+    public CommentLikeDislike postLikeOrDislike(LikeOrDislikeCommentRequest request) {
+        var comment = this.commentRepository.findById(request.getCommentId());
+        var user = this.userService.getUserById(request.getUserId());
+        List<CommentLikeDislike> list = new ArrayList<>();
+
+        if (comment.isEmpty()) {
+            throw new NotFoundException("The comment wiht id " + request.getCommentId() + " does not exist!");
+        }
+
+        if (user == null) {
+            throw new NotFoundException("The user with id " + request.getUserId() + " does not exist");
+        }
+        CommentLikeDislike temp = new CommentLikeDislike();
+        temp.setEmbedableCommentLikeDislikeId(new EmbedableCommentLikeDislikeId(user.getId(), comment.get().getId()));
+        temp.setLikeOrDislike(request.isLikeOrDislike());
+        temp.setComment(comment.get());
+        temp.setUser(user);
+        list.add(temp);
+
+        comment.get().setLikeDislikes(list);
+
+        var com = this.commentRepository.save(comment.get());
+        return temp;
+    }
+
+    public List<CommentDto> getAllCommentsByPostId(Long id) {
+        var comments = this.commentRepository.getAllCommentsByPostId(id);
+
+        if(comments == null) {
+            throw new NotFoundException("Comments are null");
+        }
+
+        return comments.stream().map(e -> commentMapper.toDto(e)).collect(Collectors.toList());
     }
 
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.project.reddit.dto.comment.LikedOrDislikedComments;
 import com.project.reddit.dto.post.PostForFrontPageDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,6 +19,8 @@ import java.util.List;
 @AllArgsConstructor
 public class UserProfileDto {
 
+    private Long id;
+
     private String username;
 
     private String email;
@@ -31,4 +34,5 @@ public class UserProfileDto {
 
     private List<PostForFrontPageDto> posts;
 
+    private List<LikedOrDislikedComments> likedOrDislikedComments;
 }

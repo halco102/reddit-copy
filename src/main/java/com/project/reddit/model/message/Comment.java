@@ -15,6 +15,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -51,6 +52,10 @@ public class Comment {
 
     @Column(name = "parent_comment_id")
     private Long parentId;
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<CommentLikeDislike> likeDislikes;
 
     public Comment(Long id, String text, LocalDate createdAt, Post post, User user, Long parentId) {
         this.id = id;
