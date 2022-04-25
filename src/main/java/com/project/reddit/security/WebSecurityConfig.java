@@ -68,6 +68,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/swagger-resources/**",
                         "/*/swagger-resources/**",
                         "/*/v2/api-docs").permitAll()
+                .antMatchers("/api/v1/post", "/api/v1/post/{\\d+}", "/api/v1/post/title").permitAll()
                 .and()
                 .userDetailsService(userDetailesService)
                 .exceptionHandling()

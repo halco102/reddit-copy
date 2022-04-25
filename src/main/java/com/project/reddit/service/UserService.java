@@ -98,6 +98,12 @@ public class UserService {
         }
     }
 
+    public UserProfileDto getUserProfileWithJwt() {
+        var user = getCurrentlyLoggedUser();
+
+        return userMapper.userProfileDto(user);
+    }
+
     public User getUserById(Long id) {
 
         if (id == null) {

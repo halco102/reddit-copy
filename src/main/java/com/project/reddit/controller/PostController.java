@@ -18,7 +18,7 @@ public class PostController {
 
     private final PostService postService;
 
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
     @PostMapping()
     public ResponseEntity<?> savePost(@RequestBody @Valid PostRequestDto requestDto) {
         return new ResponseEntity<>(this.postService.savePost(requestDto), HttpStatus.OK);
