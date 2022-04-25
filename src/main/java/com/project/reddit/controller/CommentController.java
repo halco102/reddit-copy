@@ -1,6 +1,7 @@
 package com.project.reddit.controller;
 
 import com.project.reddit.dto.comment.CommentRequest;
+import com.project.reddit.dto.comment.LikeOrDislikeCommentRequest;
 import com.project.reddit.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,16 @@ public class CommentController {
     @GetMapping()
     public ResponseEntity<?> testEndpoint() {
         return new ResponseEntity<>(this.commentService.getAllComments(), HttpStatus.OK);
+    }
+
+    @PostMapping("/like-dislike")
+    public ResponseEntity<?> postLikeOrDislike(@RequestBody LikeOrDislikeCommentRequest request) {
+        return new ResponseEntity<>(this.commentService.postLikeOrDislike(request), HttpStatus.OK);
+    }
+
+    @GetMapping("/post/{id}")
+    public ResponseEntity<?> getAllCommentsByPostId(@PathVariable Long id){
+        return new ResponseEntity<>(this.commentService.getAllCommentsByPostId(id), HttpStatus.OK);
     }
 
 }

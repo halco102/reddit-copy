@@ -3,8 +3,10 @@ package com.project.reddit.controller;
 import com.project.reddit.dto.post.PostRequestDto;
 import com.project.reddit.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -16,7 +18,7 @@ public class PostController {
 
     private final PostService postService;
 
-
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
     @PostMapping()
     public ResponseEntity<?> savePost(@RequestBody @Valid PostRequestDto requestDto) {
         return new ResponseEntity<>(this.postService.savePost(requestDto), HttpStatus.OK);

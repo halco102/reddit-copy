@@ -14,6 +14,13 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @Slf4j
 public class CustomGlobalException extends ResponseEntityExceptionHandler {
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    public ErrorMessage handleException(ClassCastException ex){
+        log.error(ex.getMessage(), ex);
+        return new ErrorMessage(500, ex.getMessage());
+    }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)

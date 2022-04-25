@@ -9,7 +9,8 @@ username varchar(255) NOT NULL UNIQUE,
 password varchar(255) NOT NULL ,
 email varchar(255) NOT NULL UNIQUE,
 created_at DATE NOT NULL ,
-image_url varchar(255) NOT NULL
+image_url varchar(255) NOT NULL,
+roles varchar(10) NOT NULL
 );
 
 CREATE TABLE posts(
@@ -35,4 +36,23 @@ parent_comment_id int8,
 
 FOREIGN KEY (posts_id) REFERENCES posts(id),
 FOREIGN KEY (users_id) REFERENCES users(id)
+);
+
+CREATE Table likes_dislikes_comments(
+    is_like boolean,
+    comments_id int8 ,
+    users_id int8 NOT NULL ,
+
+    FOREIGN KEY (comments_id) REFERENCES comments(id),
+    FOREIGN KEY (users_id) REFERENCES users(id)
+);
+
+CREATE Table likes_dislikes_posts(
+
+    is_like boolean,
+    users_id int8 NOT NULL ,
+    posts_id int8,
+
+    FOREIGN KEY (users_id) REFERENCES users(id),
+    FOREIGN KEY (posts_id) references posts(id)
 );

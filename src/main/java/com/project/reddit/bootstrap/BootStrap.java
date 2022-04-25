@@ -2,13 +2,17 @@ package com.project.reddit.bootstrap;
 
 import com.project.reddit.model.content.Post;
 import com.project.reddit.model.message.Comment;
+import com.project.reddit.model.message.CommentLikeDislike;
+import com.project.reddit.model.message.EmbedableCommentLikeDislikeId;
 import com.project.reddit.model.user.User;
+import com.project.reddit.model.user.UserRole;
 import com.project.reddit.repository.CommentRepository;
 import com.project.reddit.repository.PostRepository;
 import com.project.reddit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -24,15 +28,18 @@ public class BootStrap implements CommandLineRunner {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
 
+    private final BCryptPasswordEncoder passwordEncoder;
+
     @Override
     public void run(String... args) throws Exception {
 
         //create users
-        User user = new User(null, "halco","123123", "email@email.com", LocalDate.now(), "https://avatars.dicebear.com/api/bottts/cb358bab.svg");
-        User user1 = new User(null, "weejws","123123", "email1@email.com", LocalDate.now(), "https://avatars.dicebear.com/api/bottts/cb3258bab.svg");
-        User user2 = new User(null, "nedim","123123", "email2@email.com", LocalDate.now(), "https://avatars.dicebear.com/api/bottts/cb3548bab.svg");
-        User user3 = new User(null, "amar","123123", "email3@email.com", LocalDate.now(), "https://avatars.dicebear.com/api/bottts/cb35zbab.svg");
-        User user4 = new User(null, "igor","123123", "email4@email.com", LocalDate.now(), "https://avatars.dicebear.com/api/bottts/cb3f8bab.svg");
+        final String password = "123123123";
+        User user = new User(null, "halco", passwordEncoder.encode(password), "email@email.com", LocalDate.now(), "https://avatars.dicebear.com/api/bottts/cb358bab.svg", UserRole.ROLE_ADMIN);
+        User user1 = new User(null, "weejws", passwordEncoder.encode(password), "email1@email.com", LocalDate.now(), "https://avatars.dicebear.com/api/bottts/cb3258bab.svg",UserRole.ROLE_USER);
+        User user2 = new User(null, "nedim", passwordEncoder.encode(password), "email2@email.com", LocalDate.now(), "https://avatars.dicebear.com/api/bottts/cb3548bab.svg",UserRole.ROLE_ADMIN);
+        User user3 = new User(null, "amar", passwordEncoder.encode(password), "email3@email.com", LocalDate.now(), "https://avatars.dicebear.com/api/bottts/cb35zbab.svg",UserRole.ROLE_USER);
+        User user4 = new User(null, "igor", passwordEncoder.encode(password), "email4@email.com", LocalDate.now(), "https://avatars.dicebear.com/api/bottts/cb3f8bab.svg",UserRole.ROLE_ADMIN);
 
         List<User> users = Arrays.asList(user, user1, user2, user3, user4);
 
@@ -76,6 +83,18 @@ public class BootStrap implements CommandLineRunner {
                 comment10,comment11,comment12,comment13,comment14,comment15);
 
         comments.stream().forEach(i -> commentRepository.save(i));
+
+        // add likes to comments
+
+        CommentLikeDislike commentLikeDislike = new CommentLikeDislike();
+        commentLikeDislike.setComment(comment);
+        commentLikeDislike.setUser(user);
+        commentLikeDislike.setLikeOrDislike(true);
+        user.setLikeDislikes(Arrays.asList(commentLikeDislike));
+
+
+        userRepository.save(user);
+
 
         log.info("Added all to db");
 

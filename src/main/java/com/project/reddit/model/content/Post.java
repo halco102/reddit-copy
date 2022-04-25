@@ -40,7 +40,7 @@ public class Post {
     @JoinColumn(name = "users_id", referencedColumnName = "id")
     private User user;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Comment> comments;
 
     public Post(Long id, String title, String text, String imageUrl, boolean allowComments, User user) {
