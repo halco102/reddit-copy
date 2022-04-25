@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -23,10 +24,18 @@ import javax.servlet.http.HttpServletResponse;
 @EnableWebSecurity
 @RequiredArgsConstructor
 @Slf4j
+@EnableGlobalMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtUserDetailesService userDetailesService;
-    private final AuthTokenFilter filter;
+
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
+    @Bean
+    public AuthTokenFilter authTokenFilter() {
+        return new AuthTokenFilter();
+    }
+
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -62,16 +71,23 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .userDetailsService(userDetailesService)
                 .exceptionHandling()
-                .authenticationEntryPoint((request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized"))
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
-        http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
+        http.anonymous().disable();
+        http.addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
-
-
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers("/v2/api-docs",
+                "/configuration/ui",
+                "/swagger-resources/**",
+                "/configuration/security",
+                "/swagger-ui.html",
+                "/webjars/**");
+    }
 
     /*    @Bean
     public WebMvcConfigurer corsConfig() {

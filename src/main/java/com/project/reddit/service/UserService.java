@@ -1,10 +1,8 @@
 package com.project.reddit.service;
 
 import com.project.reddit.dto.user.*;
-import com.project.reddit.exception.BadRequestException;
-import com.project.reddit.exception.DuplicateException;
-import com.project.reddit.exception.NotFoundException;
-import com.project.reddit.exception.Unauthorized;
+import com.project.reddit.exception.ClassCastException;
+import com.project.reddit.exception.*;
 import com.project.reddit.mapper.UserMapper;
 import com.project.reddit.model.user.User;
 import com.project.reddit.repository.UserRepository;
@@ -84,6 +82,7 @@ public class UserService {
         if (userByUsername.isEmpty()) {
             throw new NotFoundException("The user with username: " + username + " does not exist!");
         }
+
         return userMapper.userProfileDto(userByUsername.get());
     }
 
@@ -127,10 +126,34 @@ public class UserService {
 
             userLoginResponse.setJWT(jwtTokenUtil.generateJwtToken(auth));
 
+
             return userLoginResponse;
 
         }else {
             throw new Unauthorized("The password does not match");
+        }
+
+    }
+
+    protected User getCurrentlyLoggedUser() {
+        User user = null;
+        String username = null;
+
+        var temp = SecurityContextHolder.getContext();
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if(authentication == null) {
+            throw new Unauthorized("Not authorized");
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof CustomUserDetailsImp) {
+            username = ((CustomUserDetailsImp) principal).getUsername();
+            return this.userRepository.getUserByUsername(username).orElseThrow(() -> new NotFoundException("User not found!"));
+        }else {
+            throw new ClassCastException("Class cast exception");
         }
 
     }

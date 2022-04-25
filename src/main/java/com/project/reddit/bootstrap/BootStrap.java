@@ -35,11 +35,11 @@ public class BootStrap implements CommandLineRunner {
 
         //create users
         final String password = "123123123";
-        User user = new User(null, "halco", passwordEncoder.encode(password), "email@email.com", LocalDate.now(), "https://avatars.dicebear.com/api/bottts/cb358bab.svg", UserRole.ADMIN);
-        User user1 = new User(null, "weejws", passwordEncoder.encode(password), "email1@email.com", LocalDate.now(), "https://avatars.dicebear.com/api/bottts/cb3258bab.svg",UserRole.USER);
-        User user2 = new User(null, "nedim", passwordEncoder.encode(password), "email2@email.com", LocalDate.now(), "https://avatars.dicebear.com/api/bottts/cb3548bab.svg",UserRole.ADMIN);
-        User user3 = new User(null, "amar", passwordEncoder.encode(password), "email3@email.com", LocalDate.now(), "https://avatars.dicebear.com/api/bottts/cb35zbab.svg",UserRole.USER);
-        User user4 = new User(null, "igor", passwordEncoder.encode(password), "email4@email.com", LocalDate.now(), "https://avatars.dicebear.com/api/bottts/cb3f8bab.svg",UserRole.ADMIN);
+        User user = new User(null, "halco", passwordEncoder.encode(password), "email@email.com", LocalDate.now(), "https://avatars.dicebear.com/api/bottts/cb358bab.svg", UserRole.ROLE_ADMIN);
+        User user1 = new User(null, "weejws", passwordEncoder.encode(password), "email1@email.com", LocalDate.now(), "https://avatars.dicebear.com/api/bottts/cb3258bab.svg",UserRole.ROLE_USER);
+        User user2 = new User(null, "nedim", passwordEncoder.encode(password), "email2@email.com", LocalDate.now(), "https://avatars.dicebear.com/api/bottts/cb3548bab.svg",UserRole.ROLE_ADMIN);
+        User user3 = new User(null, "amar", passwordEncoder.encode(password), "email3@email.com", LocalDate.now(), "https://avatars.dicebear.com/api/bottts/cb35zbab.svg",UserRole.ROLE_USER);
+        User user4 = new User(null, "igor", passwordEncoder.encode(password), "email4@email.com", LocalDate.now(), "https://avatars.dicebear.com/api/bottts/cb3f8bab.svg",UserRole.ROLE_ADMIN);
 
         List<User> users = Arrays.asList(user, user1, user2, user3, user4);
 

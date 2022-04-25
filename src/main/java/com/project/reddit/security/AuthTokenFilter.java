@@ -1,7 +1,10 @@
 package com.project.reddit.security;
 
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,17 +24,20 @@ import java.util.Arrays;
 import java.util.List;
 
 
-@RequiredArgsConstructor
 @Slf4j
-@Component
 public class AuthTokenFilter extends OncePerRequestFilter {
 
-    private final JwtUserDetailesService userDetailesService;
+    @Autowired
+    JwtUserDetailesService userDetailesService;
 
-    private final JwtTokenUtil jwtTokenUtil;
+    @Autowired
+    JwtTokenUtil jwtTokenUtil;
+
+    public AuthTokenFilter(){}
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
         try {
             String jwt = parseJwt(request);
 
@@ -73,12 +79,12 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             "/webjars/springfox-swagger-ui/fonts/open-sans-v15-latin-700.woff2",
             "/webjars/springfox-swagger-ui/favicon-16x16.png"));
 
-    @Override
+/*    @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
         if (excludeUrlPatterns.contains(path)) {
             return true;
         }
         return false;
-    }
+    }*/
 }

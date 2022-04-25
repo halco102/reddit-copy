@@ -5,15 +5,12 @@ import io.jsonwebtoken.impl.DefaultClaims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 @Component
 @Slf4j
@@ -56,7 +53,7 @@ public class JwtTokenUtil implements Serializable {
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(secret).parseClaimsJwt(token);
+            Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
             return true;
         }catch (SignatureException e) {
             log.error(e.getMessage());
