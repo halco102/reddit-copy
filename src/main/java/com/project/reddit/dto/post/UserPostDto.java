@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserPostDto {
 
+    private Long id;
+
     private String username;
 
     private String imageUrl;

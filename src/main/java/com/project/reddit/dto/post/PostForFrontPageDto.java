@@ -14,7 +14,8 @@ public class PostForFrontPageDto {
 
     private String title;
 
+    private String text;
+
     private String imageUrl;
 
-    private BasicUserInfo basicUserInfo;
 }
