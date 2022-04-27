@@ -14,7 +14,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -55,7 +55,7 @@ public class Comment {
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<CommentLikeDislike> likeDislikes;
+    private List<CommentLikeDislike> likeDislikes = new ArrayList<>();
 
     public Comment(Long id, String text, LocalDate createdAt, Post post, User user, Long parentId) {
         this.id = id;

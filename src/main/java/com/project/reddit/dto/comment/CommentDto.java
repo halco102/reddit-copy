@@ -1,10 +1,12 @@
 package com.project.reddit.dto.comment;
 
-import com.project.reddit.dto.user.BasicUserInfo;
-import com.project.reddit.dto.user.UserProfileDto;
+import com.project.reddit.dto.user.UserInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -15,8 +17,9 @@ public class CommentDto {
 
     private String text;
 
-    private BasicUserInfo userInfo;
+    private UserInfo userInfo;
 
     private Long parentId;
 
+    private List<LikedOrDislikedCommentsDto> likedOrDislikedComments = new ArrayList<>();
 }
