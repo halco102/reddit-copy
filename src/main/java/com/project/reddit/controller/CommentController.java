@@ -6,6 +6,7 @@ import com.project.reddit.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,6 +16,7 @@ public class CommentController {
 
     private final CommentService commentService;
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @PostMapping()
     public ResponseEntity<?> postCommentOnPost(@RequestBody CommentRequest request) {
         return new ResponseEntity<>(commentService.postComment(request), HttpStatus.OK);
@@ -25,6 +27,7 @@ public class CommentController {
         return new ResponseEntity<>(this.commentService.getAllComments(), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @PostMapping("/like-dislike")
     public ResponseEntity<?> postLikeOrDislike(@RequestBody LikeOrDislikeCommentRequest request) {
         return new ResponseEntity<>(this.commentService.postLikeOrDislike(request), HttpStatus.OK);
