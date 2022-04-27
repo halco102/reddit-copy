@@ -1,6 +1,5 @@
 package com.project.reddit.dto.post;
 
-import com.project.reddit.model.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,6 +23,6 @@ public class PostRequestDto {
 /*    @NotNull
     private Long userId;*/
 
-    private boolean allowComment;
+    private boolean allowComments;
 
 }

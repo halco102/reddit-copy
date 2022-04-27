@@ -1,7 +1,6 @@
 package com.project.reddit.dto.post;
 
-import com.project.reddit.dto.user.UserProfileDto;
-import com.project.reddit.model.user.User;
+import com.project.reddit.dto.user.UserInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,6 +25,6 @@ public class PostResponseDto {
 
     @NotNull
     @NotBlank
-    private UserPostDto postedBy;
+    private UserInfo postedBy;
 
 }
