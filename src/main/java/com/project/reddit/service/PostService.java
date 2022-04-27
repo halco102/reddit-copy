@@ -10,8 +10,6 @@ import com.project.reddit.model.content.Post;
 import com.project.reddit.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpRequest;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,7 +24,6 @@ public class PostService {
     private final PostMapper postMapper;
     private final UserService userService;
 
-
     public PostResponseDto savePost(PostRequestDto requestDto) {
 
         //var getUserById = userService.getUserById(requestDto.getUserId());
@@ -34,7 +31,7 @@ public class PostService {
 
         Post post = postMapper.toEntity(requestDto);
 
-        post.setAllowComments(requestDto.isAllowComment());
+        post.setAllowComments(requestDto.isAllowComments());
         post.setUser(user);
 
         var savedPost = this.postRepository.save(post);
