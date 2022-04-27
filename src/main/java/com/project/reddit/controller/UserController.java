@@ -1,8 +1,7 @@
 package com.project.reddit.controller;
 
-import com.project.reddit.dto.user.UserLoginRequestDto;
-import com.project.reddit.dto.user.UserSignupRequestDto;
-import com.project.reddit.repository.UserRepository;
+import com.project.reddit.dto.user.login.UserLoginRequestDto;
+import com.project.reddit.dto.user.signup.UserSignupRequestDto;
 import com.project.reddit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

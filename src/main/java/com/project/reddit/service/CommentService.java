@@ -1,8 +1,12 @@
 package com.project.reddit.service;
 
-import com.project.reddit.dto.comment.*;
+import com.project.reddit.dto.comment.CommentDto;
+import com.project.reddit.dto.comment.CommentRequest;
+import com.project.reddit.dto.comment.EditCommentDto;
+import com.project.reddit.dto.comment.LikeOrDislikeCommentRequest;
 import com.project.reddit.exception.NotFoundException;
 import com.project.reddit.mapper.CommentMapper;
+import com.project.reddit.mapper.UserMapper;
 import com.project.reddit.model.message.Comment;
 import com.project.reddit.model.message.CommentLikeDislike;
 import com.project.reddit.model.message.EmbedableCommentLikeDislikeId;
@@ -13,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,8 +30,11 @@ public class CommentService {
     private final UserService userService;
     private final PostService postService;
 
+    private final UserMapper userMapper;
+
     public CommentDto postComment(CommentRequest request) {
-        var findUser = this.userService.getUserById(request.getUserId());
+
+        var findUser = userService.getCurrentlyLoggedUser();
         var findPost = this.postService.findPostById(request.getPostId());
 
         Comment comment = commentMapper.toEntity(request);
@@ -77,9 +83,10 @@ public class CommentService {
         return getAllCommentsFromDb.stream().map(e -> this.commentMapper.toDto(e)).collect(Collectors.toList());
     }
 
-    public CommentLikeDislike postLikeOrDislike(LikeOrDislikeCommentRequest request) {
+    public CommentDto postLikeOrDislike(LikeOrDislikeCommentRequest request) {
+
         var comment = this.commentRepository.findById(request.getCommentId());
-        var user = this.userService.getUserById(request.getUserId());
+        var user = userService.getCurrentlyLoggedUser();
         List<CommentLikeDislike> list = new ArrayList<>();
 
         if (comment.isEmpty()) {
@@ -94,12 +101,13 @@ public class CommentService {
         temp.setLikeOrDislike(request.isLikeOrDislike());
         temp.setComment(comment.get());
         temp.setUser(user);
-        list.add(temp);
 
-        comment.get().setLikeDislikes(list);
+        comment.get().getLikeDislikes().add(temp);
 
         var com = this.commentRepository.save(comment.get());
-        return temp;
+
+        var commentDto = commentMapper.toDto(com);
+        return commentDto;
     }
 
     public List<CommentDto> getAllCommentsByPostId(Long id) {

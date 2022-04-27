@@ -7,13 +7,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserSignupResponseDto {
+public class UserInfo {
 
     private Long id;
 
     private String username;
-
-    private String email;
 
     private String imageUrl;
 

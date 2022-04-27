@@ -1,4 +1,4 @@
-package com.project.reddit.dto.user;
+package com.project.reddit.dto.user.login;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

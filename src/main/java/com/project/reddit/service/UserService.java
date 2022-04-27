@@ -1,6 +1,10 @@
 package com.project.reddit.service;
 
 import com.project.reddit.dto.user.*;
+import com.project.reddit.dto.user.login.UserLoginRequestDto;
+import com.project.reddit.dto.user.login.UserLoginResponse;
+import com.project.reddit.dto.user.signup.UserSignupRequestDto;
+import com.project.reddit.dto.user.signup.UserSignupResponseDto;
 import com.project.reddit.exception.ClassCastException;
 import com.project.reddit.exception.*;
 import com.project.reddit.mapper.UserMapper;
@@ -130,10 +134,10 @@ public class UserService {
                     //new UsernamePasswordAuthenticationToken(getUserByEmail.get().getUsername(), passwordEncoder.encode(getUserByEmail.get().getPassword()));
             SecurityContextHolder.getContext().setAuthentication(auth);
 
-            userLoginResponse.setJWT(jwtTokenUtil.generateJwtToken(auth));
+            var mapper = userMapper.userLoginResponseDto(getUserByEmail.get(), jwtTokenUtil.generateJwtToken(auth));
 
 
-            return userLoginResponse;
+            return mapper;
 
         }else {
             throw new Unauthorized("The password does not match");

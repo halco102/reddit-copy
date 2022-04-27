@@ -1,8 +1,7 @@
 package com.project.reddit.dto.post;
 
 import com.project.reddit.dto.comment.CommentDto;
-import com.project.reddit.model.message.Comment;
-import com.project.reddit.model.user.User;
+import com.project.reddit.dto.user.UserInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,9 +28,10 @@ public class PostDto {
 
     @NotNull
     @NotBlank
-    private UserPostDto postedBy;
+    private UserInfo postedBy;
 
     private List<CommentDto> commentsDto = new ArrayList<>();
 
     private boolean allowComments;
+
 }
