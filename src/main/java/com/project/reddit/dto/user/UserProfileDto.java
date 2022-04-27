@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import com.project.reddit.dto.comment.LikedOrDislikedComments;
+import com.project.reddit.dto.comment.LikedOrDislikedCommentsUser;
 import com.project.reddit.dto.post.PostForFrontPageDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,5 +34,6 @@ public class UserProfileDto {
 
     private List<PostForFrontPageDto> posts;
 
-    private List<LikedOrDislikedComments> likedOrDislikedComments;
+    private List<LikedOrDislikedCommentsUser> likedOrDislikedComments;
+
 }

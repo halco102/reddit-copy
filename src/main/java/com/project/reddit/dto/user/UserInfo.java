@@ -7,11 +7,12 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BasicUserInfo {
+public class UserInfo {
 
     private Long id;
 
     private String username;
 
     private String imageUrl;
+
 }
