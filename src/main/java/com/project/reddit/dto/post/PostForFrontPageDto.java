@@ -1,6 +1,5 @@
 package com.project.reddit.dto.post;
 
-import com.project.reddit.dto.user.BasicUserInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
