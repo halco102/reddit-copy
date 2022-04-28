@@ -1,6 +1,8 @@
 package com.project.reddit.bootstrap;
 
+import com.project.reddit.model.content.EmbedablePostLikeOrDislikeId;
 import com.project.reddit.model.content.Post;
+import com.project.reddit.model.content.PostLikeOrDislike;
 import com.project.reddit.model.message.Comment;
 import com.project.reddit.model.message.CommentLikeDislike;
 import com.project.reddit.model.message.EmbedableCommentLikeDislikeId;
@@ -53,7 +55,17 @@ public class BootStrap implements CommandLineRunner {
         Post post3 = new Post(null, "aepgojaepgjapog gaeoigjaeiogjaeiogjaeiog gaeoigjaeiogjaeiogjaeiog", "", "https://avatars.dicebear.com/api/bottts/cb35dab1.svg",  true, user3);
         Post post4 = new Post(null, "KGEPOAGKAEPOGKAEPOGKAEPOGPO", "gjpaegjoaepgjaepgojaepgo', 'gaeoigjaeiogjaeiogjaeiog gaeoigjaeiogjaeiogjaeiog gaeoigjaeiogjaeiogjaeiog", "https://avatars.dicebear.com/api/bottts/cb35adab1.svg",  true, user4);
 
-        List<Post> posts = Arrays.asList(post, post1, post2, post3, post4);
+        Post post5 = new Post(null, "Blah", "", "https://img-9gag-fun.9cache.com/photo/aYrMb30_700bwp.webp",  true, user);
+        Post post6 = new Post(null, "SOME IMAGE", "Some random text", "https://i.imgur.com/ZxtSYA7.jpg",  true, user);
+        Post post7 = new Post(null, "got death threats over place. how's your day? :D", "" +
+                "got death threats over place. how's your day? :Dgot death threats over place. how's your day? :Dgot death threats over place. how's your day? :D" , "https://preview.redd.it/6x3xwhvr04s81.jpg?width=640&crop=smart&auto=webp&s=12e286f10d8ce741ad1e36a0074c9796f0fbb58f",  true, user);
+        Post post8 = new Post(null, "aepgojaepgjapog gaeoigjaeiogjaeiogjaeiog gaeoigjaeiogjaeiogjaeiog", "", "https://avatars.dicebear.com/api/bottts/cb35dab1.svg",  true, user);
+        Post post9 = new Post(null, "KGEPOAGKAEPOGKAEPOGKAEPOGPO", "gjpaegjoaepgjaepgojaepgo', 'gaeoigjaeiogjaeiogjaeiog gaeoigjaeiogjaeiogjaeiog gaeoigjaeiogjaeiogjaeiog", "https://avatars.dicebear.com/api/bottts/cb35adab1.svg",  true, user);
+
+
+
+
+        List<Post> posts = Arrays.asList(post, post1, post2, post3, post4, post5, post6, post7, post8, post9);
         posts.stream().forEach(i -> postRepository.save(i));
 
         //comments
@@ -95,6 +107,14 @@ public class BootStrap implements CommandLineRunner {
 
         userRepository.save(user);
 
+
+        PostLikeOrDislike postLikeOrDislike = new PostLikeOrDislike();
+        postLikeOrDislike.setPost(post);
+        postLikeOrDislike.setUser(user);
+        postLikeOrDislike.setEmbedablePostLikeOrDislikeId(new EmbedablePostLikeOrDislikeId(user.getId(), post.getId()));
+
+        post.setPostLikeOrDislikes(Arrays.asList(postLikeOrDislike));
+        this.postRepository.save(post);
 
         log.info("Added all to db");
 

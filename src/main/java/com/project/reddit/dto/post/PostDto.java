@@ -34,4 +34,6 @@ public class PostDto {
 
     private boolean allowComments;
 
+    private List<PostLikeOrDislikeDto> postLikeOrDislikeDtos;
+
 }

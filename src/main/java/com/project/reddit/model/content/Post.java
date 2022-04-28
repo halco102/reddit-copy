@@ -43,6 +43,9 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Comment> comments;
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private List<PostLikeOrDislike> postLikeOrDislikes;
+
     public Post(Long id, String title, String text, String imageUrl, boolean allowComments, User user) {
         this.id = id;
         this.title = title;

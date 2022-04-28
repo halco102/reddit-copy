@@ -87,7 +87,6 @@ public class CommentService {
 
         var comment = this.commentRepository.findById(request.getCommentId());
         var user = userService.getCurrentlyLoggedUser();
-        List<CommentLikeDislike> list = new ArrayList<>();
 
         if (comment.isEmpty()) {
             throw new NotFoundException("The comment wiht id " + request.getCommentId() + " does not exist!");
@@ -102,7 +101,21 @@ public class CommentService {
         temp.setComment(comment.get());
         temp.setUser(user);
 
-        comment.get().getLikeDislikes().add(temp);
+        if (!comment.get().getLikeDislikes().isEmpty()){
+            var findComment = comment.get().getLikeDislikes()
+                    .stream()
+                    .filter(e -> e.getEmbedableCommentLikeDislikeId().getCommentId() == request.getCommentId()
+                            && e.getEmbedableCommentLikeDislikeId().getUserId() == user.getId()).findAny();
+            if (!findComment.isEmpty()) {
+                findComment.get().setLikeOrDislike(request.isLikeOrDislike());
+            }else {
+                comment.get().getLikeDislikes().add(temp);
+            }
+        }else {
+            comment.get().getLikeDislikes().add(temp);
+        }
+
+
 
         var com = this.commentRepository.save(comment.get());
 

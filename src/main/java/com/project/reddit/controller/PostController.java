@@ -1,5 +1,6 @@
 package com.project.reddit.controller;
 
+import com.project.reddit.dto.post.PostLikeOrDislikeRequest;
 import com.project.reddit.dto.post.PostRequestDto;
 import com.project.reddit.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -37,5 +38,11 @@ public class PostController {
     @GetMapping("/title")
     public ResponseEntity<?> getPostsByTitle(@RequestParam String title) {
         return new ResponseEntity<>(this.postService.getSimilarPostsByTitle(title) ,HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    @PostMapping("/like-dislike")
+    public ResponseEntity<?> postLikeOrDislike(@RequestBody PostLikeOrDislikeRequest request){
+        return new ResponseEntity<>(this.postService.saveLikeOrDislikeForPost(request), HttpStatus.OK);
     }
 }
