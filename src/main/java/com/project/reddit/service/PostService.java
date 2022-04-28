@@ -1,12 +1,15 @@
 package com.project.reddit.service;
 
 import com.project.reddit.dto.post.PostDto;
+import com.project.reddit.dto.post.PostLikeOrDislikeRequest;
 import com.project.reddit.dto.post.PostRequestDto;
 import com.project.reddit.dto.post.PostResponseDto;
 import com.project.reddit.exception.BadRequestException;
 import com.project.reddit.exception.NotFoundException;
 import com.project.reddit.mapper.PostMapper;
+import com.project.reddit.model.content.EmbedablePostLikeOrDislikeId;
 import com.project.reddit.model.content.Post;
+import com.project.reddit.model.content.PostLikeOrDislike;
 import com.project.reddit.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -81,6 +84,36 @@ public class PostService {
         }
 
         return listOfPosts.stream().map(e -> postMapper.toPostDto(e)).collect(Collectors.toList());
+    }
+
+    public PostDto saveLikeOrDislikeForPost(PostLikeOrDislikeRequest request) {
+        var getPostById = this.postRepository.findById(request.getPostId());
+        var user = userService.getCurrentlyLoggedUser();
+
+        if (getPostById.isEmpty()) {
+            throw new NotFoundException("Post by id: " + request.getPostId() + " cannot befound");
+        }
+
+        PostLikeOrDislike postLikeOrDislike = new PostLikeOrDislike(new EmbedablePostLikeOrDislikeId(user.getId(), getPostById.get().getId()),
+                getPostById.get(), user, request.isLikeOrDislike());
+
+
+        if (!getPostById.get().getPostLikeOrDislikes().isEmpty()){
+            var findComment = getPostById.get().getPostLikeOrDislikes()
+                    .stream()
+                    .filter(e -> e.getEmbedablePostLikeOrDislikeId().getPostId() == request.getPostId()
+                            && e.getEmbedablePostLikeOrDislikeId().getUserId() == user.getId()).findAny();
+            if (!findComment.isEmpty()) {
+                findComment.get().setLikeOrDislike(request.isLikeOrDislike());
+            }else {
+                getPostById.get().getPostLikeOrDislikes().add(postLikeOrDislike);
+            }
+        }else {
+            getPostById.get().getPostLikeOrDislikes().add(postLikeOrDislike);
+        }
+
+        var savePost = this.postRepository.save(getPostById.get());
+        return postMapper.toPostDto(savePost);
     }
 
 }

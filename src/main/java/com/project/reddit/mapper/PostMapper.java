@@ -20,5 +20,6 @@ public interface PostMapper {
 
     @Mapping(source = "user", target = "postedBy")
     @Mapping(target = "commentsDto", source = "comments")
+    @Mapping(source = "post.postLikeOrDislikes", target = "postLikeOrDislikeDtos")
     PostDto toPostDto(Post post);
 }
