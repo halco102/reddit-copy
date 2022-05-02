@@ -1,0 +1,31 @@
+app:
+  version: 1.0.0
+spring:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2
+
+  datasource:
+
+    #h2
+    url: jdbc:h2:mem:testReditDB;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;
+    username: sa
+    password: password
+    driverClassName: org.h2.Driver
+    #end h2 datasource conf
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQL92Dialect
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: none
+
+  sql:
+    init:
+      mode: always
+
+
+jwt-secret-key: ${JWT_SECRET_KEY}
