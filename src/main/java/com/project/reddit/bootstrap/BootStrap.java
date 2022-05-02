@@ -1,3 +1,4 @@
+/*
 package com.project.reddit.bootstrap;
 
 import com.project.reddit.model.content.EmbedablePostLikeOrDislikeId;
@@ -120,3 +121,4 @@ public class BootStrap implements CommandLineRunner {
 
     }
 }
+*/
