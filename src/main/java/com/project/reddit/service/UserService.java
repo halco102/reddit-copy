@@ -1,6 +1,6 @@
 package com.project.reddit.service;
 
-import com.project.reddit.dto.user.*;
+import com.project.reddit.dto.user.UserProfileDto;
 import com.project.reddit.dto.user.login.UserLoginRequestDto;
 import com.project.reddit.dto.user.login.UserLoginResponse;
 import com.project.reddit.dto.user.signup.UserSignupRequestDto;
@@ -9,6 +9,7 @@ import com.project.reddit.exception.ClassCastException;
 import com.project.reddit.exception.*;
 import com.project.reddit.mapper.UserMapper;
 import com.project.reddit.model.user.User;
+import com.project.reddit.model.user.UserRole;
 import com.project.reddit.repository.UserRepository;
 import com.project.reddit.security.CustomUserDetailsImp;
 import com.project.reddit.security.JwtTokenUtil;
@@ -47,6 +48,7 @@ public class UserService {
         user.setCreatedAt(LocalDate.now());
         user.setImageUrl(RANDOM_AVATAR_URL + UUID.randomUUID() + ".svg");
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setUserRole(UserRole.ROLE_USER);
 
         if(userRepository.getUserByUsername(signupRequest.getUsername()).isPresent()) {
             throw new DuplicateException("Username is already taken");
