@@ -14,6 +14,7 @@ import com.project.reddit.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,10 +28,20 @@ public class PostService {
     private final PostMapper postMapper;
     private final UserService userService;
 
-    public PostResponseDto savePost(PostRequestDto requestDto) {
+    private final CloudinaryService cloudinaryService;
+
+    public PostResponseDto savePost(PostRequestDto requestDto, MultipartFile file) {
 
         //var getUserById = userService.getUserById(requestDto.getUserId());
         var user = userService.getCurrentlyLoggedUser();
+        String imageUrl = null;
+
+        if (requestDto.getImageUrl().isBlank() && file == null) {
+            throw new BadRequestException("Image url and files are blank or null");
+        }else if (file != null) {
+            // upload file and get url
+            requestDto.setImageUrl(cloudinaryService.getUrlFromUploadedMedia(file));
+        }
 
         Post post = postMapper.toEntity(requestDto);
 

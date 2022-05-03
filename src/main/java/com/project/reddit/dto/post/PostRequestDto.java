@@ -3,6 +3,7 @@ package com.project.reddit.dto.post;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -19,6 +20,7 @@ public class PostRequestDto {
     private String text;
 
     private String imageUrl;
+
 
 /*    @NotNull
     private Long userId;*/
