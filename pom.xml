@@ -149,6 +149,12 @@
 			<version>8.4.3</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.cloudinary</groupId>
+			<artifactId>cloudinary-http43</artifactId>
+			<version>1.29.0</version>
+		</dependency>
+
 
 	</dependencies>
 

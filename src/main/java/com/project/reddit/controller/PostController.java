@@ -1,28 +1,39 @@
 package com.project.reddit.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.reddit.dto.post.PostLikeOrDislikeRequest;
 import com.project.reddit.dto.post.PostRequestDto;
 import com.project.reddit.service.PostService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.web.header.Header;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 
 @RequestMapping("/api/v1/post")
 @RequiredArgsConstructor
 @RestController
+@Slf4j
 public class PostController {
 
     private final PostService postService;
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
-    @PostMapping()
-    public ResponseEntity<?> savePost(@RequestBody @Valid PostRequestDto requestDto) {
-        return new ResponseEntity<>(this.postService.savePost(requestDto), HttpStatus.OK);
+    @PostMapping(value = "", consumes = {  MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE }, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<?> savePost(@RequestPart("requestDto") String requestDto,
+                                      @RequestPart(value = "file", required = false) MultipartFile multipartFile) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        PostRequestDto postRequestDto = objectMapper.readValue(requestDto, PostRequestDto.class);
+
+
+        return new ResponseEntity<>(this.postService.savePost(postRequestDto, multipartFile), HttpStatus.OK);
     }
 
     @GetMapping()
