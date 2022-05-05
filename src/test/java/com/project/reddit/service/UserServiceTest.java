@@ -1,112 +1,120 @@
 package com.project.reddit.service;
 
-import com.project.reddit.dto.user.signup.UserSignupRequestDto;
+import com.project.reddit.dto.user.UserProfileDto;
+import com.project.reddit.dto.user.login.UserLoginRequestDto;
+import com.project.reddit.dto.user.login.UserLoginResponse;
+import com.project.reddit.exception.BadRequestException;
 import com.project.reddit.mapper.UserMapper;
-import com.project.reddit.mapper.UserMapperImpl;
 import com.project.reddit.model.user.User;
+import com.project.reddit.model.user.UserRole;
 import com.project.reddit.repository.UserRepository;
-import com.project.reddit.security.CustomUserDetailsImp;
 import com.project.reddit.security.JwtTokenUtil;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import springfox.documentation.spi.service.contexts.SecurityContext;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {
-        UserMapperImpl.class,
-        JwtTokenUtil.class,
-        CustomUserDetailsImp.class
-})
-class UserServiceTest {
+
+@ExtendWith(MockitoExtension.class)
+public class UserServiceTest {
 
     @Mock
-    private UserRepository userRepository;
-
-    @Autowired
-    private UserMapper userMapper;
+    UserRepository userRepository;
 
     @Mock
-    private AuthenticationManager authenticationManager;
+    UserMapper userMapper;
 
     @Mock
-    private BCryptPasswordEncoder passwordEncoder;
+    AuthenticationManager authenticationManager;
 
-    @Autowired
+    @Mock
+    BCryptPasswordEncoder passwordEncoder;
+
+    @Mock
     private JwtTokenUtil jwtTokenUtil;
 
+    @InjectMocks
     private UserService userService;
 
-    private AutoCloseable autoCloseable;
 
-    @BeforeEach
-    void setUp() {
-        autoCloseable =  MockitoAnnotations.openMocks(this);
-        userService = new UserService(userRepository, userMapper, authenticationManager, passwordEncoder, jwtTokenUtil);
-    }
-
-    @AfterEach
-    void tearDown() throws Exception{
-        autoCloseable.close();
-    }
+    User testUser = new User(1L, "halco", "password", "email@email.com", LocalDate.now(), "image", UserRole.ROLE_USER);
+    UserProfileDto testUserProfile = new UserProfileDto(testUser.getId(), testUser.getUsername(), testUser.getEmail(), testUser.getCreatedAt(), testUser.getImageUrl(), new ArrayList<>(), new ArrayList<>());
+    UserLoginRequestDto userLoginRequestDto = new UserLoginRequestDto("email@emal.com", "password");
 
     @Test
     void signupUser() {
-        UserSignupRequestDto userSignupRequestDto = new UserSignupRequestDto();
-        userSignupRequestDto.setUsername("username");
-        userSignupRequestDto.setPassword("123123123");
-        userSignupRequestDto.setEmail("email@email.com");
-
-        var userMap = userMapper.signupToEntity(userSignupRequestDto);
-        userMap.setPosts(new ArrayList<>());
-        userMap.setLikeDislikes(new ArrayList<>());
-        userMap.setImageUrl("Image url");
-
-        userRepository.save(userMap);
-
-        ArgumentCaptor<User> argumentCaptor = ArgumentCaptor.forClass(User.class);
-
-        verify(userRepository).save(argumentCaptor.capture());
-
-        var capture = argumentCaptor.getValue();
-
-        assertThat(capture).isEqualTo(userMap);
-
     }
 
     @Test
-    void canGetUserByUsername() {
-        //when
-        userRepository.getUserByUsername("halco");
-        verify(userRepository).getUserByUsername("halco");
+    void getUserProfileByUsername() {
+        Mockito.when(userRepository.getUserByUsername("halco")).thenReturn(Optional.of(testUser));
+        Mockito.when(userMapper.userProfileDto(testUser)).thenReturn(testUserProfile);
+
+        var response = userService.getUserProfileByUsernameOrId("halco", null);
+
+        Assertions.assertEquals(response, testUserProfile);
     }
 
     @Test
-    void canGetUserByEmail() {
-        userRepository.getUserByEmail("mock");
-        verify(userRepository).getUserByEmail("mock");
+    void getUserProfileById() {
+        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+        Mockito.when(userMapper.userProfileDto(testUser)).thenReturn(testUserProfile);
+
+        var response = userService.getUserProfileByUsernameOrId(null, 1L);
+
+        Assertions.assertEquals(response, testUserProfile);
     }
 
+    @Test
+    @DisplayName("Method getUserProfileByUsernameOrId should fail if username AND id are null")
+    void failTestWhenUserProfileParametersAreNull(){
+        var exception = assertThrows(BadRequestException.class, () -> {
+            userService.getUserProfileByUsernameOrId(null,null);
+        });
+        assertEquals("Username and id are null", exception.getMessage());
+    }
 
     @Test
+    void getUserProfileWithJwt() {
+    }
+
+    @Test
+    @DisplayName("Get User object by id")
     void getUserById() {
+        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+        var response = userService.getUserById(1L);
+        Assertions.assertEquals(response, testUser);
     }
 
     @Test
     void userLogin() {
+/*
+        Mockito.when(userRepository.getUserByEmail("email@email.com")).thenReturn(Optional.of(testUser));
+
+        assertNotNull(testUser);
+
+        Mockito.when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken()))
+
+        UserLoginResponse userLoginResponse = new UserLoginResponse();*/
+
+
+
+
+
     }
 
     @Test
