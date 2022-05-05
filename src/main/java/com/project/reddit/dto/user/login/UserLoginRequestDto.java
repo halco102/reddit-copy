@@ -15,7 +15,7 @@ public class UserLoginRequestDto {
     @Email
     private String email;
 
-    @Size(min = 5, max = 20)
+    @Size(min = 8, max = 20)
     private String password;
 
 }
