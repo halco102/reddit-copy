@@ -51,9 +51,17 @@ public class PostController {
         return new ResponseEntity<>(this.postService.getSimilarPostsByTitle(title) ,HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
     @PostMapping("/like-dislike")
     public ResponseEntity<?> postLikeOrDislike(@RequestBody PostLikeOrDislikeRequest request){
         return new ResponseEntity<>(this.postService.saveLikeOrDislikeForPost(request), HttpStatus.OK);
     }
+
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletePostById(@PathVariable Long id) {
+        this.postService.deletePostById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }
