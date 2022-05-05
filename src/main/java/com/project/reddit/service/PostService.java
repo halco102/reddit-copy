@@ -53,6 +53,23 @@ public class PostService {
         return postMapper.postResponse(savedPost);
     }
 
+    public void deletePostById(Long id) {
+        var user = userService.getCurrentlyLoggedUser();
+        var post = postRepository.findById(id);
+
+        if (post.isEmpty()) {
+            throw new NotFoundException("This post of id "  + id + " does not exist");
+        }
+
+        if (user.getPosts().stream().anyMatch(item -> item.equals(post.get()))) {
+            // can delete
+            postRepository.deleteById(id);
+            log.info("Post deleted");
+        }else {
+            throw new NotFoundException("User does not have the right to delete this post");
+        }
+    }
+
     public List<PostDto> getAllPosts() {
         var getPosts = this.postRepository.findAll();
 
