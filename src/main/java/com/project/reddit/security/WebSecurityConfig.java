@@ -16,6 +16,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -57,10 +59,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
-        corsConfiguration.setAllowedOrigins(List.of("*"));
+        //corsConfiguration.setAllowedOrigins(List.of("*"));
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PUT","OPTIONS","PATCH", "DELETE"));
         corsConfiguration.setAllowCredentials(true);
         corsConfiguration.setExposedHeaders(List.of("Authorization"));
+        corsConfiguration.setAllowedMethods(Arrays.asList("Get", "POST", "DELTE", "PUT", "PATCH", "HEAD"));
 
         http.cors().disable();
 
@@ -72,7 +75,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/swagger-ui/**",
                         "/swagger-resources/**",
                         "/*/swagger-resources/**",
-                        "/*/v2/api-docs").permitAll()
+                        "/*/v2/api-docs", "/temp/**").permitAll()
                 .antMatchers("/api/v1/post", "/api/v1/post/{\\d+}", "/api/v1/post/title").permitAll()
                 .and()
                 .userDetailsService(userDetailesService)
@@ -92,8 +95,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/swagger-resources/**",
                 "/configuration/security",
                 "/swagger-ui.html",
-                "/webjars/**", "/h2/**");
+                "/webjars/**", "/h2/**","/temp/**");
     }
+
+
 
 
 
