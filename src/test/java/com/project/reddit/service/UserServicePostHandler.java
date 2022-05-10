@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceTest {
+public class UserServicePostHandler {
 
     @Mock
     UserRepository userRepository;

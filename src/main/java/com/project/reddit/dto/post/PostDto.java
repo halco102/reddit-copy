@@ -34,6 +34,6 @@ public class PostDto {
 
     private boolean allowComments;
 
-    private List<PostLikeOrDislikeDto> postLikeOrDislikeDtos;
+    private List<PostLikeOrDislikeDto> postLikeOrDislikeDtos = new ArrayList<>();
 
 }

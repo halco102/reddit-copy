@@ -13,9 +13,11 @@ import com.project.reddit.model.content.PostLikeOrDislike;
 import com.project.reddit.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,9 +30,10 @@ public class PostService {
     private final PostMapper postMapper;
     private final UserService userService;
 
+    //private final SimpMessagingTemplate simpMessagingTemplate;
     private final CloudinaryService cloudinaryService;
 
-    public PostResponseDto savePost(PostRequestDto requestDto, MultipartFile file) {
+    public PostDto savePost(PostRequestDto requestDto, MultipartFile file) {
 
         //var getUserById = userService.getUserById(requestDto.getUserId());
         var user = userService.getCurrentlyLoggedUser();
@@ -50,7 +53,17 @@ public class PostService {
 
         var savedPost = this.postRepository.save(post);
         log.info("Post is saved " + savedPost);
-        return postMapper.postResponse(savedPost);
+
+        var postMap = postMapper.postResponse(savedPost);
+        var postDto = postMapper.toPostDto(savedPost);
+
+        //workaround
+        postDto.setCommentsDto(new ArrayList<>());
+        postDto.setPostLikeOrDislikeDtos(new ArrayList<>());
+
+        //simpMessagingTemplate.convertAndSend("/topic/post", postMap);
+
+        return postDto;
     }
 
     public void deletePostById(Long id) {
@@ -142,6 +155,10 @@ public class PostService {
 
         var savePost = this.postRepository.save(getPostById.get());
         return postMapper.toPostDto(savePost);
+    }
+
+    public void deleteAllPosts() {
+        this.postRepository.deleteAll();
     }
 
 }
