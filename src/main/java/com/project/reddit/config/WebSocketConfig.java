@@ -11,10 +11,10 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(new PostHandler(), "/ws/post").
-                setAllowedOrigins("chrome-extension://cbcbkhdmedgianpaifchdaddpnmgnknn", "http://localhost:8081")
+                setAllowedOrigins("chrome-extension://cbcbkhdmedgianpaifchdaddpnmgnknn", "http://localhost:8081", "*")
                 .addInterceptors()
                 .addHandler(new CommentHandler(), "/ws/comment")
-                .setAllowedOrigins("chrome-extension://cbcbkhdmedgianpaifchdaddpnmgnknn", "http://localhost:8081");
+                .setAllowedOrigins("chrome-extension://cbcbkhdmedgianpaifchdaddpnmgnknn", "http://localhost:8081", "*");
     }
 
     /*    @Override

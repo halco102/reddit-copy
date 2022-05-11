@@ -19,7 +19,7 @@ services:
     build: .
 
     ports:
-      - 8082:8082
+      - 8082:8080
 
     environment:
       DB_USERNAME: ${DB_USERNAME}
@@ -28,12 +28,24 @@ services:
       DB_NAME: ${DB_NAME}
       DB_PORT: ${DB_PORT}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_SECRET_KEY: ${CLOUDINARY_SECRET_KEY}
+      CLOUDINARY_NAME: ${CLOUDINARY_NAME}
 
     depends_on:
       - db
 
     links:
       - db
+
+
+  nginx:
+    image: custom_nginx
+    container_name: custom_nginx
+    depends_on:
+      - reddit
+    ports:
+      - 80:80
 
 networks:
   default:
