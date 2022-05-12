@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Repository
@@ -16,5 +18,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query(value = "select * from posts as p inner join users as u on p.users_id = u.id inner join comments as c on p.id = c.posts_id where p.title LIKE :title%", nativeQuery = true)
     Set<Post> getPostsByTitle(@Param("title") String title);
+
+    @Query(value = "select * from posts where users_id = :id", nativeQuery = true)
+    Optional<List<Post>> getAllPostByUserId(@Param("id") Long id);
 
 }

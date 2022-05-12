@@ -161,4 +161,13 @@ public class PostService {
         this.postRepository.deleteAll();
     }
 
+    public List<PostDto> getAllPostsByUser(Long id) {
+        var getAllPostsByUser = this.postRepository.getAllPostByUserId(id);
+        if (getAllPostsByUser.isEmpty()) {
+            throw new NotFoundException("The object is null");
+        }
+
+        return getAllPostsByUser.get().stream().map(e -> postMapper.toPostDto(e)).collect(Collectors.toList());
+    }
+
 }

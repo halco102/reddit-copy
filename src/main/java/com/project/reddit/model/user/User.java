@@ -66,6 +66,12 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<PostLikeOrDislike> postLikeOrDislikes;
 
+    @Column(name = "verification_code")
+    private String verificationCode;
+
+    @Column(name = "verified")
+    private boolean verified;
+
 
     public User(Long id, String username, String password, String email, LocalDate createdAt, String imageUrl, UserRole role) {
         this.id = id;

@@ -39,4 +39,9 @@ public class UserController {
         return new ResponseEntity<>(this.userService.getUserProfileWithJwt(), HttpStatus.OK);
     }
 
+    @GetMapping("/verify/{code}")
+    public ResponseEntity<?> verifyUserCode(@PathVariable("code") String code) {
+        return new ResponseEntity<>(this.userService.verifieUserViaEmail(code), HttpStatus.ACCEPTED);
+    }
+
 }

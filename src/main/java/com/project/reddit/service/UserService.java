@@ -15,6 +15,8 @@ import com.project.reddit.security.CustomUserDetailsImp;
 import com.project.reddit.security.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,6 +24,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import java.time.LocalDate;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -42,6 +46,9 @@ public class UserService {
 
     private final String RANDOM_AVATAR_URL="https://avatars.dicebear.com/api/bottts/";
 
+    private final JavaMailSender mailSender;
+
+
     public UserSignupResponseDto signupUser(UserSignupRequestDto signupRequest) {
 
         var user = userMapper.signupToEntity(signupRequest);
@@ -49,6 +56,8 @@ public class UserService {
         user.setImageUrl(RANDOM_AVATAR_URL + UUID.randomUUID() + ".svg");
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setUserRole(UserRole.ROLE_USER);
+
+        user.setVerificationCode(String.valueOf(UUID.randomUUID()));
 
         if(userRepository.getUserByUsername(signupRequest.getUsername()).isPresent()) {
             throw new DuplicateException("Username is already taken");
@@ -58,7 +67,52 @@ public class UserService {
 
         var saveEntity = userRepository.save(user);
         log.info("User successfully saved to db");
+
+        try {
+            sendVerificationEmail(user);
+        }catch (MessagingException ex) {
+            log.warn(ex.getMessage());
+        }
+
         return userMapper.signupResponseDto(saveEntity);
+    }
+
+    private void sendVerificationEmail(User user) throws MessagingException {
+        String verifyUrl = "http://localhost:8082/api/v1/user/verify/" + user.getVerificationCode();
+
+        String toAddress = user.getEmail();
+        String fromAddress = "Halco";
+        String subject = "Successfully register in Reddit copy app ";
+        String content = "Dear " + user.getUsername() + " thank you for signin up my project website.\n\n" +
+                "Please follow this link <a href =" + verifyUrl + "> Verify here </a>"+ " <br>" +
+                "I hope you like it.<br>" +
+                "Best regards " + "<br>" +
+                "Halco";
+
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);
+
+        mimeMessageHelper.setFrom(fromAddress);
+        mimeMessageHelper.setTo(toAddress);
+        mimeMessageHelper.setSubject(subject);
+
+
+
+        mimeMessageHelper.setText(content, true);
+        mailSender.send(mimeMessage);
+    }
+
+    public String verifieUserViaEmail(String code) {
+        var user = this.userRepository.verifieUserCode(code);
+
+        if (user.isEmpty()) {
+            throw new BadRequestException("User not found or code is wrong");
+        }
+
+        user.get().setVerified(true);
+        userRepository.save(user.get());
+
+        return "Verified continue to vue website http://localhost:8081/";
     }
 
     private UserProfileDto fetchUserProfileById(Long id) {
@@ -68,12 +122,11 @@ public class UserService {
         }
         var user = userMapper.userProfileDto(userById.get());
 
-        if (userById.get().getLikeDislikes() == null || userById.get().getLikeDislikes().isEmpty()) {
-            return  user;
+        if (userById.get().getLikeDislikes() != null || userById.get().getLikeDislikes().isEmpty()) {
+            var like = userById.get().getLikeDislikes().stream().map(e -> userMapper.likeOrDislike(e)).collect(Collectors.toList());
+            user.setLikedOrDislikedComments(like);
         }
 
-        var like = userById.get().getLikeDislikes().stream().map(e -> userMapper.likeOrDislike(e)).collect(Collectors.toList());
-        user.setLikedOrDislikedComments(like);
         return user;
     }
 
@@ -113,7 +166,7 @@ public class UserService {
     public User getUserById(Long id) {
 
         if (id == null) {
-            throw new NotFoundException("The user with id: " + id + " cannot be found");
+            throw new NotFoundException("Id is null");
         }
         var user = this.userRepository.findById(id);
         return user.orElseThrow(() -> {throw new NotFoundException("The user with id: " + id + " does not exist");});
@@ -129,6 +182,11 @@ public class UserService {
 
         if (passwordEncoder.matches(requestDto.getPassword(), getUserByEmail.get().getPassword())) {
             log.info("Password match");
+
+            if (!getUserByEmail.get().isVerified()){
+                throw new BadRequestException("Verify email to login");
+            }
+
             UserLoginResponse userLoginResponse = new UserLoginResponse();
             Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(getUserByEmail.get().getUsername(), requestDto.getPassword())

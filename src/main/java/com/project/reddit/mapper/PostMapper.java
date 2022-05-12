@@ -1,8 +1,6 @@
 package com.project.reddit.mapper;
 
-import com.project.reddit.dto.post.PostDto;
-import com.project.reddit.dto.post.PostRequestDto;
-import com.project.reddit.dto.post.PostResponseDto;
+import com.project.reddit.dto.post.*;
 import com.project.reddit.model.content.Post;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -19,6 +17,10 @@ public interface PostMapper {
 
     @Mapping(source = "user", target = "postedBy")
     PostResponseDto postResponse(Post post);
+
+    @Mapping(source = "post.postLikeOrDislikes", target = "postLikeOrDislikeDtos")
+    PostForFrontPageDto toFrontPageDto(Post post);
+
 
     @Mapping(source = "user", target = "postedBy")
     @Mapping(target = "commentsDto", source = "comments")
