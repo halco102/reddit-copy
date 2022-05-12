@@ -56,6 +56,7 @@ public class UserService {
         user.setImageUrl(RANDOM_AVATAR_URL + UUID.randomUUID() + ".svg");
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setUserRole(UserRole.ROLE_USER);
+
         user.setVerificationCode(String.valueOf(UUID.randomUUID()));
 
         if(userRepository.getUserByUsername(signupRequest.getUsername()).isPresent()) {
@@ -77,10 +78,16 @@ public class UserService {
     }
 
     private void sendVerificationEmail(User user) throws MessagingException {
+        String verifyUrl = "http://localhost:8082/api/v1/user/verify/" + user.getVerificationCode();
+
         String toAddress = user.getEmail();
         String fromAddress = "Halco";
         String subject = "Successfully register in Reddit copy app ";
-        String content = "Dear + " + user.getUsername() + " thank you for signin up my project website. I hope you like it. \n Best regards Halco";
+        String content = "Dear " + user.getUsername() + " thank you for signin up my project website.\n\n" +
+                "Please follow this link <a href =" + verifyUrl + "> Verify here </a>"+ " <br>" +
+                "I hope you like it.<br>" +
+                "Best regards " + "<br>" +
+                "Halco";
 
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);
@@ -89,10 +96,23 @@ public class UserService {
         mimeMessageHelper.setTo(toAddress);
         mimeMessageHelper.setSubject(subject);
 
-        String verifyUrl = "/api/v1/user/verify/" + user.getVerificationCode();
+
 
         mimeMessageHelper.setText(content, true);
         mailSender.send(mimeMessage);
+    }
+
+    public String verifieUserViaEmail(String code) {
+        var user = this.userRepository.verifieUserCode(code);
+
+        if (user.isEmpty()) {
+            throw new BadRequestException("User not found or code is wrong");
+        }
+
+        user.get().setVerified(true);
+        userRepository.save(user.get());
+
+        return "Verified continue to vue website http://localhost:8081/";
     }
 
     private UserProfileDto fetchUserProfileById(Long id) {
@@ -162,6 +182,11 @@ public class UserService {
 
         if (passwordEncoder.matches(requestDto.getPassword(), getUserByEmail.get().getPassword())) {
             log.info("Password match");
+
+            if (!getUserByEmail.get().isVerified()){
+                throw new BadRequestException("Verify email to login");
+            }
+
             UserLoginResponse userLoginResponse = new UserLoginResponse();
             Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(getUserByEmail.get().getUsername(), requestDto.getPassword())
