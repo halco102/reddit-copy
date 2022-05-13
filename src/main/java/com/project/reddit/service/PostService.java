@@ -3,22 +3,22 @@ package com.project.reddit.service;
 import com.project.reddit.dto.post.PostDto;
 import com.project.reddit.dto.post.PostLikeOrDislikeRequest;
 import com.project.reddit.dto.post.PostRequestDto;
-import com.project.reddit.dto.post.PostResponseDto;
 import com.project.reddit.exception.BadRequestException;
 import com.project.reddit.exception.NotFoundException;
 import com.project.reddit.mapper.PostMapper;
 import com.project.reddit.model.content.EmbedablePostLikeOrDislikeId;
 import com.project.reddit.model.content.Post;
 import com.project.reddit.model.content.PostLikeOrDislike;
+import com.project.reddit.model.user.User;
 import com.project.reddit.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -140,6 +140,7 @@ public class PostService {
 
 
         if (!getPostById.get().getPostLikeOrDislikes().isEmpty()){
+            /*
             var findComment = getPostById.get().getPostLikeOrDislikes()
                     .stream()
                     .filter(e -> e.getEmbedablePostLikeOrDislikeId().getPostId() == request.getPostId()
@@ -148,13 +149,39 @@ public class PostService {
                 findComment.get().setLikeOrDislike(request.isLikeOrDislike());
             }else {
                 getPostById.get().getPostLikeOrDislikes().add(postLikeOrDislike);
+            }*/
+            var findComment = checkIfUserLikedPost(getPostById.get(), user);
+
+            if (findComment.isEmpty()) {
+                getPostById.get().getPostLikeOrDislikes().add(postLikeOrDislike);
+            }else {
+                // if the request is same set likeDislike to null
+                if (findComment.get().isLikeOrDislike() == request.isLikeOrDislike()) {
+                    // same likedislike as in db remove it
+
+                    getPostById.get().getPostLikeOrDislikes()
+                            .removeIf(i -> i.getEmbedablePostLikeOrDislikeId().getPostId().equals(findComment.get().getEmbedablePostLikeOrDislikeId().getPostId())
+                            && i.getEmbedablePostLikeOrDislikeId().getUserId().equals(user.getId()));
+                }else {
+                    findComment.get().setLikeOrDislike(request.isLikeOrDislike()); // just change
+                }
             }
+
         }else {
+            // add if its empty
             getPostById.get().getPostLikeOrDislikes().add(postLikeOrDislike);
         }
 
         var savePost = this.postRepository.save(getPostById.get());
         return postMapper.toPostDto(savePost);
+    }
+
+    private Optional<PostLikeOrDislike> checkIfUserLikedPost(Post post, User user) {
+        var findComment = post.getPostLikeOrDislikes()
+                .stream()
+                .filter(item -> item.getEmbedablePostLikeOrDislikeId().getPostId().equals(post.getId()) &&
+                        item.getEmbedablePostLikeOrDislikeId().getUserId().equals(user.getId())).findAny();
+        return findComment;
     }
 
     public void deleteAllPosts() {
