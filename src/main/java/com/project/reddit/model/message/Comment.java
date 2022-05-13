@@ -53,7 +53,7 @@ public class Comment {
     @Column(name = "parent_comment_id")
     private Long parentId;
 
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<CommentLikeDislike> likeDislikes = new ArrayList<>();
 

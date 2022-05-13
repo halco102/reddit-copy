@@ -7,9 +7,12 @@ import com.project.reddit.dto.comment.LikeOrDislikeCommentRequest;
 import com.project.reddit.exception.NotFoundException;
 import com.project.reddit.mapper.CommentMapper;
 import com.project.reddit.mapper.UserMapper;
+import com.project.reddit.model.content.Post;
+import com.project.reddit.model.content.PostLikeOrDislike;
 import com.project.reddit.model.message.Comment;
 import com.project.reddit.model.message.CommentLikeDislike;
 import com.project.reddit.model.message.EmbedableCommentLikeDislikeId;
+import com.project.reddit.model.user.User;
 import com.project.reddit.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -101,15 +105,23 @@ public class CommentService {
         temp.setComment(comment.get());
         temp.setUser(user);
 
+
         if (!comment.get().getLikeDislikes().isEmpty()){
-            var findComment = comment.get().getLikeDislikes()
-                    .stream()
-                    .filter(e -> e.getEmbedableCommentLikeDislikeId().getCommentId() == request.getCommentId()
-                            && e.getEmbedableCommentLikeDislikeId().getUserId() == user.getId()).findAny();
-            if (!findComment.isEmpty()) {
-                findComment.get().setLikeOrDislike(request.isLikeOrDislike());
-            }else {
+            var findComment = checkIfUserLikedDislikedComment(comment.get(), user);
+
+            if (findComment.isEmpty()) {
                 comment.get().getLikeDislikes().add(temp);
+            }else {
+
+                if (findComment.get().isLikeOrDislike() == request.isLikeOrDislike()) {
+                    comment.get().getLikeDislikes()
+                            .removeIf(item -> item.getEmbedableCommentLikeDislikeId().getCommentId().equals(findComment.get().getComment().getId())
+                                    && item.getEmbedableCommentLikeDislikeId().getUserId().equals(user.getId()));
+                }else {
+                    findComment.get().setLikeOrDislike(request.isLikeOrDislike());
+                }
+
+
             }
         }else {
             comment.get().getLikeDislikes().add(temp);
@@ -121,6 +133,14 @@ public class CommentService {
 
         var commentDto = commentMapper.toDto(com);
         return commentDto;
+    }
+
+    private Optional<CommentLikeDislike> checkIfUserLikedDislikedComment(Comment comment, User user) {
+        var findComment = comment.getLikeDislikes()
+                .stream()
+                .filter(item -> item.getEmbedableCommentLikeDislikeId().getCommentId().equals(comment.getId()) &&
+                        item.getEmbedableCommentLikeDislikeId().getUserId().equals(user.getId())).findAny();
+        return findComment;
     }
 
     public List<CommentDto> getAllCommentsByPostId(Long id) {
