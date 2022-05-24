@@ -5,6 +5,7 @@ import com.project.reddit.dto.comment.CommentRequest;
 import com.project.reddit.dto.comment.EditCommentDto;
 import com.project.reddit.dto.comment.LikeOrDislikeCommentRequest;
 import com.project.reddit.exception.NotFoundException;
+import com.project.reddit.exception.Unauthorized;
 import com.project.reddit.mapper.CommentMapper;
 import com.project.reddit.mapper.UserMapper;
 import com.project.reddit.model.content.Post;
@@ -34,7 +35,6 @@ public class CommentService {
     private final UserService userService;
     private final PostService postService;
 
-    private final UserMapper userMapper;
 
     public CommentDto postComment(CommentRequest request) {
 
@@ -153,4 +153,26 @@ public class CommentService {
         return comments.stream().map(e -> commentMapper.toDto(e)).collect(Collectors.toList());
     }
 
+    public List<CommentDto> sortComments (Long postId) {
+        var sortedComments = this.commentRepository.sortedComments(postId);
+
+        var test = sortedComments.stream().map(e -> commentMapper.toDto(e)).collect(Collectors.toList());
+        return sortedComments.stream().map(e -> commentMapper.toDto(e)).collect(Collectors.toList());
+    }
+
+    public void deleteCommentById(Long id) {
+        var comments = this.commentRepository.getAllCommentsAndReplies(id);
+        var user = userService.getCurrentlyLoggedUser();
+
+        if (comments.isEmpty() || comments == null) {
+            throw new NotFoundException("Comment deos not exist");
+        }
+
+
+        //delete also other comments that replied to the main comment
+
+
+        comments.forEach(item -> this.commentRepository.delete(item));
+
+    }
 }
