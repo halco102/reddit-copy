@@ -14,7 +14,7 @@ public class WebSocketOverStompConfig implements WebSocketMessageBrokerConfigure
     public void registerStompEndpoints(StompEndpointRegistry registry) {
 
             registry.addEndpoint("/ws")
-                    .setAllowedOrigins("http://localhost:8081/", "chrome-extension://cbcbkhdmedgianpaifchdaddpnmgnknn");
+                    .setAllowedOrigins("http://localhost:8081/", "https://demo-reddit-admir-halilovic.herokuapp.com", "chrome-extension://cbcbkhdmedgianpaifchdaddpnmgnknn", "http://172.18.0.5:8080");
                     //.withSockJS();
     }
 
@@ -23,7 +23,7 @@ public class WebSocketOverStompConfig implements WebSocketMessageBrokerConfigure
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
 
-registry.enableSimpleBroker("/topic");
+        registry.enableSimpleBroker("/topic");
         registry.setApplicationDestinationPrefixes("/app");
 
     }
