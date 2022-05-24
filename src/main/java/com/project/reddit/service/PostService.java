@@ -10,36 +10,44 @@ import com.project.reddit.model.content.EmbedablePostLikeOrDislikeId;
 import com.project.reddit.model.content.Post;
 import com.project.reddit.model.content.PostLikeOrDislike;
 import com.project.reddit.model.user.User;
+import com.project.reddit.repository.CommentRepository;
 import com.project.reddit.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Lazy))
 public class PostService {
 
     private final PostRepository postRepository;
     private final PostMapper postMapper;
     private final UserService userService;
 
+    @Lazy
+    private final CommentService commentService;
+
     //private final SimpMessagingTemplate simpMessagingTemplate;
     private final CloudinaryService cloudinaryService;
+
 
     public PostDto savePost(PostRequestDto requestDto, MultipartFile file) {
 
         //var getUserById = userService.getUserById(requestDto.getUserId());
         var user = userService.getCurrentlyLoggedUser();
-        String imageUrl = null;
 
-        if (requestDto.getImageUrl().isBlank() && file == null) {
+
+        if ((requestDto.getImageUrl() == null || requestDto.getImageUrl().isBlank()) && file == null) {
             throw new BadRequestException("Image url and files are blank or null");
         }else if (file != null) {
             // upload file and get url
@@ -90,6 +98,9 @@ public class PostService {
             throw new NotFoundException("Posts list is null");
         }
 
+        //until date is implemented
+        Collections.reverse(getPosts);
+
         var posts = getPosts.stream().map(e -> postMapper.toPostDto(e)).collect(Collectors.toList());
         return posts;
     }
@@ -110,7 +121,11 @@ public class PostService {
             throw new NotFoundException("The post of id: " + id + " cannot be found");
         }
 
-        return postMapper.toPostDto(getPostById.get());
+        var commenst = this.commentService.sortComments(id);
+        var post = postMapper.toPostDto(getPostById.get());
+        post.setCommentsDto(commenst);
+
+        return post;
     }
 
     public List<PostDto> getSimilarPostsByTitle(String title) {
@@ -188,13 +203,6 @@ public class PostService {
         this.postRepository.deleteAll();
     }
 
-    public List<PostDto> getAllPostsByUser(Long id) {
-        var getAllPostsByUser = this.postRepository.getAllPostByUserId(id);
-        if (getAllPostsByUser.isEmpty()) {
-            throw new NotFoundException("The object is null");
-        }
 
-        return getAllPostsByUser.get().stream().map(e -> postMapper.toPostDto(e)).collect(Collectors.toList());
-    }
 
 }

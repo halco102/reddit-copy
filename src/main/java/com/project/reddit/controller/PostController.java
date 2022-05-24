@@ -73,9 +73,6 @@ public class PostController {
     }
 
 
-    @GetMapping("/user/{id}/post")
-    public ResponseEntity<?> getAllPostsFromUser(@PathVariable("id") Long id) {
-        return new ResponseEntity<>(this.postService.getAllPostsByUser(id), HttpStatus.OK);
-    }
+
 
 }
