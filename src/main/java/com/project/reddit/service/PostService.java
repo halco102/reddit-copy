@@ -13,33 +13,43 @@ import com.project.reddit.model.user.User;
 import com.project.reddit.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Lazy))
 public class PostService {
 
     private final PostRepository postRepository;
     private final PostMapper postMapper;
     private final UserService userService;
-
-    //private final SimpMessagingTemplate simpMessagingTemplate;
     private final CloudinaryService cloudinaryService;
 
+    private final SortingCommentsInterface sortingCommentsInterface;
+
+
+    /*
+    * This method is used for adding new post to database.
+    * The user sends the post request and optionaly a file
+    *
+    * If a user sends a file, the cloudinary method executes, it saves the image
+    * on the server and gives back the URL that will be saved in db.
+    * */
     public PostDto savePost(PostRequestDto requestDto, MultipartFile file) {
 
         //var getUserById = userService.getUserById(requestDto.getUserId());
         var user = userService.getCurrentlyLoggedUser();
-        String imageUrl = null;
 
-        if (requestDto.getImageUrl().isBlank() && file == null) {
+
+        if ((requestDto.getImageUrl() == null || requestDto.getImageUrl().isBlank()) && file == null) {
             throw new BadRequestException("Image url and files are blank or null");
         }else if (file != null) {
             // upload file and get url
@@ -54,14 +64,12 @@ public class PostService {
         var savedPost = this.postRepository.save(post);
         log.info("Post is saved " + savedPost);
 
-        var postMap = postMapper.postResponse(savedPost);
         var postDto = postMapper.toPostDto(savedPost);
 
         //workaround
         postDto.setCommentsDto(new ArrayList<>());
         postDto.setPostLikeOrDislikeDtos(new ArrayList<>());
 
-        //simpMessagingTemplate.convertAndSend("/topic/post", postMap);
 
         return postDto;
     }
@@ -90,6 +98,9 @@ public class PostService {
             throw new NotFoundException("Posts list is null");
         }
 
+        //until date is implemented
+        Collections.reverse(getPosts);
+
         var posts = getPosts.stream().map(e -> postMapper.toPostDto(e)).collect(Collectors.toList());
         return posts;
     }
@@ -110,7 +121,12 @@ public class PostService {
             throw new NotFoundException("The post of id: " + id + " cannot be found");
         }
 
-        return postMapper.toPostDto(getPostById.get());
+        var post = postMapper.toPostDto(getPostById.get());
+
+        var sortComments = sortingCommentsInterface.sortingComments(post.getCommentsDto());
+        post.setCommentsDto(sortComments);
+
+        return post;
     }
 
     public List<PostDto> getSimilarPostsByTitle(String title) {
@@ -132,7 +148,7 @@ public class PostService {
         var user = userService.getCurrentlyLoggedUser();
 
         if (getPostById.isEmpty()) {
-            throw new NotFoundException("Post by id: " + request.getPostId() + " cannot befound");
+            throw new NotFoundException("Post by id: " + request.getPostId() + " cannot be found");
         }
 
         PostLikeOrDislike postLikeOrDislike = new PostLikeOrDislike(new EmbedablePostLikeOrDislikeId(user.getId(), getPostById.get().getId()),
@@ -140,16 +156,6 @@ public class PostService {
 
 
         if (!getPostById.get().getPostLikeOrDislikes().isEmpty()){
-            /*
-            var findComment = getPostById.get().getPostLikeOrDislikes()
-                    .stream()
-                    .filter(e -> e.getEmbedablePostLikeOrDislikeId().getPostId() == request.getPostId()
-                            && e.getEmbedablePostLikeOrDislikeId().getUserId() == user.getId()).findAny();
-            if (!findComment.isEmpty()) {
-                findComment.get().setLikeOrDislike(request.isLikeOrDislike());
-            }else {
-                getPostById.get().getPostLikeOrDislikes().add(postLikeOrDislike);
-            }*/
             var findComment = checkIfUserLikedPost(getPostById.get(), user);
 
             if (findComment.isEmpty()) {
@@ -176,6 +182,10 @@ public class PostService {
         return postMapper.toPostDto(savePost);
     }
 
+    /*
+    * Helper method for save like or dislike on posts
+    * Checks if the user already liked or disliked the post
+    * */
     private Optional<PostLikeOrDislike> checkIfUserLikedPost(Post post, User user) {
         var findComment = post.getPostLikeOrDislikes()
                 .stream()
@@ -188,13 +198,6 @@ public class PostService {
         this.postRepository.deleteAll();
     }
 
-    public List<PostDto> getAllPostsByUser(Long id) {
-        var getAllPostsByUser = this.postRepository.getAllPostByUserId(id);
-        if (getAllPostsByUser.isEmpty()) {
-            throw new NotFoundException("The object is null");
-        }
 
-        return getAllPostsByUser.get().stream().map(e -> postMapper.toPostDto(e)).collect(Collectors.toList());
-    }
 
 }

@@ -1,5 +1,6 @@
 package com.project.reddit.service;
 
+import com.project.reddit.dto.post.PostDto;
 import com.project.reddit.dto.user.UserProfileDto;
 import com.project.reddit.dto.user.login.UserLoginRequestDto;
 import com.project.reddit.dto.user.login.UserLoginResponse;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -78,7 +80,7 @@ public class UserService {
     }
 
     private void sendVerificationEmail(User user) throws MessagingException {
-        String verifyUrl = "http://localhost:8082/api/v1/user/verify/" + user.getVerificationCode();
+        String verifyUrl = "https://demo-reddit-project.herokuapp.com/api/v1/user/verify/" + user.getVerificationCode();
 
         String toAddress = user.getEmail();
         String fromAddress = "Halco";
@@ -226,6 +228,15 @@ public class UserService {
             throw new ClassCastException("Class cast exception");
         }
 
+    }
+
+    public UserProfileDto getAllPostsByUser(Long id) {
+        var getAllPostsByUser = this.userRepository.getAllPostByUserId(id);
+        if (getAllPostsByUser.isEmpty()) {
+            throw new NotFoundException("The object is null");
+        }
+        var temp = userMapper.userProfileDto(getAllPostsByUser.get());
+        return temp;
     }
 
 

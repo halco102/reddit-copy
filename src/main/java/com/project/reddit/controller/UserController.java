@@ -2,6 +2,7 @@ package com.project.reddit.controller;
 
 import com.project.reddit.dto.user.login.UserLoginRequestDto;
 import com.project.reddit.dto.user.signup.UserSignupRequestDto;
+import com.project.reddit.service.PostService;
 import com.project.reddit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import javax.validation.Valid;
 public class UserController {
 
     private final UserService userService;
+
 
     @PostMapping()
     public ResponseEntity<?> signupUser(@RequestBody @Valid UserSignupRequestDto signupRequestDto) {
@@ -42,6 +44,11 @@ public class UserController {
     @GetMapping("/verify/{code}")
     public ResponseEntity<?> verifyUserCode(@PathVariable("code") String code) {
         return new ResponseEntity<>(this.userService.verifieUserViaEmail(code), HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping("/{id}/posts")
+    public ResponseEntity<?> getAllPostsFromUser(@PathVariable("id") Long id) {
+        return new ResponseEntity<>(this.userService.getAllPostsByUser(id), HttpStatus.OK);
     }
 
 }
