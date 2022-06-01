@@ -17,6 +17,10 @@ public class CloudinaryService {
 
     private final Cloudinary cloudinary;
 
+
+    /*
+    * Upload the file to cloudinary server and return the url as String
+    * */
     public String getUrlFromUploadedMedia(MultipartFile multipartFile) {
         try {
             log.info("Uploading file...");

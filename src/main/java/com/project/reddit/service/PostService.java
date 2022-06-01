@@ -10,11 +10,9 @@ import com.project.reddit.model.content.EmbedablePostLikeOrDislikeId;
 import com.project.reddit.model.content.Post;
 import com.project.reddit.model.content.PostLikeOrDislike;
 import com.project.reddit.model.user.User;
-import com.project.reddit.repository.CommentRepository;
 import com.project.reddit.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,14 +31,18 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostMapper postMapper;
     private final UserService userService;
-
-    @Lazy
-    private final CommentService commentService;
-
-    //private final SimpMessagingTemplate simpMessagingTemplate;
     private final CloudinaryService cloudinaryService;
 
+    private final SortingCommentsInterface sortingCommentsInterface;
 
+
+    /*
+    * This method is used for adding new post to database.
+    * The user sends the post request and optionaly a file
+    *
+    * If a user sends a file, the cloudinary method executes, it saves the image
+    * on the server and gives back the URL that will be saved in db.
+    * */
     public PostDto savePost(PostRequestDto requestDto, MultipartFile file) {
 
         //var getUserById = userService.getUserById(requestDto.getUserId());
@@ -62,14 +64,12 @@ public class PostService {
         var savedPost = this.postRepository.save(post);
         log.info("Post is saved " + savedPost);
 
-        var postMap = postMapper.postResponse(savedPost);
         var postDto = postMapper.toPostDto(savedPost);
 
         //workaround
         postDto.setCommentsDto(new ArrayList<>());
         postDto.setPostLikeOrDislikeDtos(new ArrayList<>());
 
-        //simpMessagingTemplate.convertAndSend("/topic/post", postMap);
 
         return postDto;
     }
@@ -121,9 +121,10 @@ public class PostService {
             throw new NotFoundException("The post of id: " + id + " cannot be found");
         }
 
-        var commenst = this.commentService.sortComments(id);
         var post = postMapper.toPostDto(getPostById.get());
-        post.setCommentsDto(commenst);
+
+        var sortComments = sortingCommentsInterface.sortingComments(post.getCommentsDto());
+        post.setCommentsDto(sortComments);
 
         return post;
     }
@@ -147,7 +148,7 @@ public class PostService {
         var user = userService.getCurrentlyLoggedUser();
 
         if (getPostById.isEmpty()) {
-            throw new NotFoundException("Post by id: " + request.getPostId() + " cannot befound");
+            throw new NotFoundException("Post by id: " + request.getPostId() + " cannot be found");
         }
 
         PostLikeOrDislike postLikeOrDislike = new PostLikeOrDislike(new EmbedablePostLikeOrDislikeId(user.getId(), getPostById.get().getId()),
@@ -155,16 +156,6 @@ public class PostService {
 
 
         if (!getPostById.get().getPostLikeOrDislikes().isEmpty()){
-            /*
-            var findComment = getPostById.get().getPostLikeOrDislikes()
-                    .stream()
-                    .filter(e -> e.getEmbedablePostLikeOrDislikeId().getPostId() == request.getPostId()
-                            && e.getEmbedablePostLikeOrDislikeId().getUserId() == user.getId()).findAny();
-            if (!findComment.isEmpty()) {
-                findComment.get().setLikeOrDislike(request.isLikeOrDislike());
-            }else {
-                getPostById.get().getPostLikeOrDislikes().add(postLikeOrDislike);
-            }*/
             var findComment = checkIfUserLikedPost(getPostById.get(), user);
 
             if (findComment.isEmpty()) {
@@ -191,6 +182,10 @@ public class PostService {
         return postMapper.toPostDto(savePost);
     }
 
+    /*
+    * Helper method for save like or dislike on posts
+    * Checks if the user already liked or disliked the post
+    * */
     private Optional<PostLikeOrDislike> checkIfUserLikedPost(Post post, User user) {
         var findComment = post.getPostLikeOrDislikes()
                 .stream()

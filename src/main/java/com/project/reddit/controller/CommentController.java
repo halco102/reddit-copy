@@ -24,7 +24,7 @@ public class CommentController {
 
     @GetMapping()
     public ResponseEntity<?> testEndpoint() {
-        return new ResponseEntity<>(this.commentService.getAllComments(), HttpStatus.OK);
+        return new ResponseEntity<>(this.commentService.getAllCommentsByPostId(1L), HttpStatus.OK);
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
@@ -33,10 +33,6 @@ public class CommentController {
         return new ResponseEntity<>(this.commentService.postLikeOrDislike(request), HttpStatus.OK);
     }
 
-    @GetMapping("/post/{id}")
-    public ResponseEntity<?> getAllCommentsByPostId(@PathVariable Long id){
-        return new ResponseEntity<>(this.commentService.sortComments(id), HttpStatus.OK);
-    }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
     @DeleteMapping("/{id}")
@@ -45,9 +41,9 @@ public class CommentController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/sorted/post/{id}")
-    public ResponseEntity<?> sortedComments(@PathVariable Long id) {
-        return new ResponseEntity<>(this.commentService.sortComments(id), HttpStatus.OK);
+    @GetMapping("/post/{id}")
+    public ResponseEntity<?> getAllCommentsFromPostByPostId(@PathVariable("id") Long postId) {
+        return new ResponseEntity<>(this.commentService.getAllCommentsByPostId(postId), HttpStatus.OK);
     }
 
 }
