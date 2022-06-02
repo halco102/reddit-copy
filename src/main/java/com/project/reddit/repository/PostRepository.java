@@ -19,5 +19,14 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Set<Post> getPostsByTitle(@Param("title") String title);
 
 
-
+    /*
+    * sort posts by number of likes
+    * if there are no likes or dislikes on posts (it would be null) change it to 0
+    * */
+    @Query(value = "select posts.*, c.*, u.*, coalesce(sum(CASE WHEN pld.is_like = :condition THEN 1 ELSE 0 END)) as cnt from posts" +
+            "    left join post_likes_dislikes pld on posts.id = pld.posts_id" +
+            "    left outer join comments c on posts.id = c.posts_id" +
+            "    left join users u on posts.users_id = u.id" +
+            "    group by posts.id, c.id, u.id order by cnt desc", nativeQuery = true)
+    List<Post> sortPostByLikesOrDislikes(@Param("condition") boolean condition);
 }

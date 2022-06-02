@@ -17,10 +17,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -163,13 +160,13 @@ public class PostService {
             }else {
                 // if the request is same set likeDislike to null
                 if (findComment.get().isLikeOrDislike() == request.isLikeOrDislike()) {
-                    // same likedislike as in db remove it
-
+                    // same like request as in the db, remove it from list
                     getPostById.get().getPostLikeOrDislikes()
                             .removeIf(i -> i.getEmbedablePostLikeOrDislikeId().getPostId().equals(findComment.get().getEmbedablePostLikeOrDislikeId().getPostId())
                             && i.getEmbedablePostLikeOrDislikeId().getUserId().equals(user.getId()));
                 }else {
-                    findComment.get().setLikeOrDislike(request.isLikeOrDislike()); // just change
+                    // there is no same request as in db add it to the list
+                    findComment.get().setLikeOrDislike(request.isLikeOrDislike());
                 }
             }
 
@@ -199,5 +196,30 @@ public class PostService {
     }
 
 
+    /*
+    * This method is used for sorting posts by number of likes
+    * */
+    public List<PostDto> sortPostByNumberOfLikes() {
+        var sortByNumberOfLikes = this.postRepository.sortPostByLikesOrDislikes(true);
+
+        if (sortByNumberOfLikes == null) {
+           throw new NotFoundException("List is null");
+        }
+
+        return sortByNumberOfLikes.stream().map(e -> postMapper.toPostDto(e)).collect(Collectors.toList());
+    }
+
+    /*
+    * This method is used for sorting posts by number of dislikes
+    * */
+    public List<PostDto> sortPostByNumberOfDislikes() {
+        var sortByNumberOfDislikes = this.postRepository.sortPostByLikesOrDislikes(false);
+
+        if (sortByNumberOfDislikes == null) {
+            throw new NotFoundException("List is null");
+        }
+
+        return sortByNumberOfDislikes.stream().map(e -> postMapper.toPostDto(e)).collect(Collectors.toList());
+    }
 
 }

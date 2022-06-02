@@ -4,7 +4,6 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
 import com.project.reddit.dto.comment.CommentDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

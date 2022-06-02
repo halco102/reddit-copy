@@ -72,6 +72,15 @@ public class PostController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @GetMapping("/sort/likes")
+    public ResponseEntity<?> sortPostByNumberOfLikes() {
+        return new ResponseEntity<>(this.postService.sortPostByNumberOfLikes(), HttpStatus.OK);
+    }
+
+    @GetMapping("/sort/dislikes")
+    public ResponseEntity<?> sortPostByNumberOfDislikes() {
+        return new ResponseEntity<>(this.postService.sortPostByNumberOfDislikes(), HttpStatus.OK);
+    }
 
 
 
