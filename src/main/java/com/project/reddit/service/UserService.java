@@ -196,7 +196,7 @@ public class UserService {
                     //new UsernamePasswordAuthenticationToken(getUserByEmail.get().getUsername(), passwordEncoder.encode(getUserByEmail.get().getPassword()));
             SecurityContextHolder.getContext().setAuthentication(auth);
 
-            var mapper = userMapper.userLoginResponseDto(getUserByEmail.get(), jwtTokenUtil.generateJwtToken(auth));
+            var mapper = userMapper.userLoginResponseDto(jwtTokenUtil.generateJwtToken(auth));
 
 
             return mapper;
@@ -239,5 +239,8 @@ public class UserService {
         return temp;
     }
 
+    public boolean checkIfJwtIsValid(String jwt) {
+        return this.jwtTokenUtil.validateToken(jwt);
+    }
 
 }

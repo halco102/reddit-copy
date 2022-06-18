@@ -20,9 +20,9 @@ public interface UserMapper {
 
     UserSignupResponseDto signupResponseDto(User entity);
 
-    @Mapping(target = "userProfileDto", source = "user")
+    //@Mapping(target = "userProfileDto", source = "user")
     @Mapping(target = "jwt", source = "token")
-    UserLoginResponse userLoginResponseDto(User user, String token);
+    UserLoginResponse userLoginResponseDto(String token);
 
     @Mapping(target = "posts", source = "posts")
     UserProfileDto userProfileDto(User user);
