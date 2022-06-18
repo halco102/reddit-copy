@@ -51,4 +51,9 @@ public class UserController {
         return new ResponseEntity<>(this.userService.getAllPostsByUser(id), HttpStatus.OK);
     }
 
+    @GetMapping("/jwt/valid")
+    public ResponseEntity<?> checkIfJwtIsValid(@RequestParam String jwt) {
+        return new ResponseEntity<>(this.userService.checkIfJwtIsValid(jwt), HttpStatus.OK);
+    }
+
 }
