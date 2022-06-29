@@ -82,6 +82,14 @@ public class PostController {
         return new ResponseEntity<>(this.postService.sortPostByNumberOfDislikes(), HttpStatus.OK);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<?> searchPostsByName(@RequestParam String name) {
+        return new ResponseEntity<>(this.postService.searchPostByName(name), HttpStatus.OK);
+    }
 
+    @GetMapping("/user/{id}")
+    public ResponseEntity<?> filterUsersPosts(@PathVariable Long id) {
+        return new ResponseEntity<>(this.postService.filterPostsFromUserProfile(id), HttpStatus.OK);
+    }
 
 }

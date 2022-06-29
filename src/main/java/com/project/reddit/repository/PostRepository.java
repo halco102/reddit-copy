@@ -29,4 +29,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "    left join users u on posts.users_id = u.id" +
             "    group by posts.id, c.id, u.id order by cnt desc", nativeQuery = true)
     List<Post> sortPostByLikesOrDislikes(@Param("condition") boolean condition);
+
+
+    /*
+    * Search posts by title
+    * */
+    @Query(value = "Select * from posts where title like :title%", nativeQuery = true)
+    Set<Post> searchPostsByName(@Param("title") String title);
 }

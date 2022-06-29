@@ -6,11 +6,14 @@ import com.project.reddit.dto.post.PostRequestDto;
 import com.project.reddit.exception.BadRequestException;
 import com.project.reddit.exception.NotFoundException;
 import com.project.reddit.mapper.PostMapper;
+import com.project.reddit.model.SearchTypes;
 import com.project.reddit.model.content.EmbedablePostLikeOrDislikeId;
 import com.project.reddit.model.content.Post;
 import com.project.reddit.model.content.PostLikeOrDislike;
 import com.project.reddit.model.user.User;
 import com.project.reddit.repository.PostRepository;
+import com.project.reddit.service.search.FilterUserContent;
+import com.project.reddit.service.search.Search;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
@@ -31,6 +34,11 @@ public class PostService {
     private final CloudinaryService cloudinaryService;
 
     private final SortingCommentsInterface sortingCommentsInterface;
+
+    private final Search<Post> postSearch;
+
+    private final FilterUserContent<Post> filterUserContent;
+
 
 
     /*
@@ -221,5 +229,16 @@ public class PostService {
 
         return sortByNumberOfDislikes.stream().map(e -> postMapper.toPostDto(e)).collect(Collectors.toList());
     }
+
+    public Set<PostDto> searchPostByName(String name) {
+        var search =  postSearch.search(name);
+        return search.stream().map(m -> postMapper.toPostDto(m)).collect(Collectors.toSet());
+    }
+
+    public List<PostDto> filterPostsFromUserProfile(Long userId) {
+        return this.filterUserContent.filterUserContent(userId, SearchTypes.POST).stream().map(e -> postMapper.toPostDto(e)).collect(Collectors.toList());
+    }
+
+
 
 }

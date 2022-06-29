@@ -56,4 +56,9 @@ public class UserController {
         return new ResponseEntity<>(this.userService.checkIfJwtIsValid(jwt), HttpStatus.OK);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<?> searchUsersByName(@RequestParam String name) {
+        return new ResponseEntity<>(this.userService.searchUsersByName(name), HttpStatus.OK);
+    }
+
 }

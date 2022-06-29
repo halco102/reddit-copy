@@ -8,11 +8,13 @@ import com.project.reddit.dto.comment.EditCommentDto;
 import com.project.reddit.dto.comment.LikeOrDislikeCommentRequest;
 import com.project.reddit.exception.NotFoundException;
 import com.project.reddit.mapper.CommentMapper;
+import com.project.reddit.model.SearchTypes;
 import com.project.reddit.model.message.Comment;
 import com.project.reddit.model.message.CommentLikeDislike;
 import com.project.reddit.model.message.EmbedableCommentLikeDislikeId;
 import com.project.reddit.model.user.User;
 import com.project.reddit.repository.CommentRepository;
+import com.project.reddit.service.search.FilterUserContent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,8 @@ public class CommentService {
     private final PostService postService;
 
     private final SortingCommentsInterface sortingCommentsInterface;
+
+    private final FilterUserContent<Comment> filterUserContent;
 
 
     /*
@@ -205,5 +209,10 @@ public class CommentService {
 
         comments.forEach(item -> this.commentRepository.delete(item));
 
+    }
+
+
+    public List<CommentDto> filterUserComments(Long userId) {
+        return this.filterUserContent.filterUserContent(userId, SearchTypes.COMMENTS).stream().map(e -> commentMapper.toDto(e)).collect(Collectors.toList());
     }
 }

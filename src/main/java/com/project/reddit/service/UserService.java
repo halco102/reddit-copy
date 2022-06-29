@@ -1,6 +1,5 @@
 package com.project.reddit.service;
 
-import com.project.reddit.dto.post.PostDto;
 import com.project.reddit.dto.user.UserProfileDto;
 import com.project.reddit.dto.user.login.UserLoginRequestDto;
 import com.project.reddit.dto.user.login.UserLoginResponse;
@@ -14,6 +13,7 @@ import com.project.reddit.model.user.UserRole;
 import com.project.reddit.repository.UserRepository;
 import com.project.reddit.security.CustomUserDetailsImp;
 import com.project.reddit.security.JwtTokenUtil;
+import com.project.reddit.service.search.Search;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -49,6 +49,9 @@ public class UserService {
     private final String RANDOM_AVATAR_URL="https://avatars.dicebear.com/api/bottts/";
 
     private final JavaMailSender mailSender;
+
+    private final Search<User> userSearch;
+
 
 
     public UserSignupResponseDto signupUser(UserSignupRequestDto signupRequest) {
@@ -242,5 +245,12 @@ public class UserService {
     public boolean checkIfJwtIsValid(String jwt) {
         return this.jwtTokenUtil.validateToken(jwt);
     }
+
+    public Set<UserProfileDto> searchUsersByName(String name) {
+        var searchResults = this.userSearch.search(name);
+
+        return searchResults.stream().map(m -> userMapper.userProfileDto(m)).collect(Collectors.toSet());
+    }
+
 
 }
