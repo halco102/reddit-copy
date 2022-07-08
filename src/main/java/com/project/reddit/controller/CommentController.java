@@ -46,4 +46,9 @@ public class CommentController {
         return new ResponseEntity<>(this.commentService.getAllCommentsByPostId(postId), HttpStatus.OK);
     }
 
+    @GetMapping("/user/comment/{id}")
+    public ResponseEntity<?> filterUserComments(@PathVariable Long id) {
+        return new ResponseEntity<>(this.commentService.filterUserComments(id), HttpStatus.OK);
+    }
+
 }

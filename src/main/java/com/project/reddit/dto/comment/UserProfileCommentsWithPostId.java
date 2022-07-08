@@ -1,15 +1,18 @@
-package com.project.reddit.dto.post;
+package com.project.reddit.dto.comment;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostLikeOrDislikeDto {
+public class UserProfileCommentsWithPostId {
 
     private Long postId;
 
-    private boolean likeOrDislike;
+    private Set<CommentDto> commentDto;
+
 }

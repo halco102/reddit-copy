@@ -2,9 +2,11 @@ package com.project.reddit.controller;
 
 import com.project.reddit.dto.user.login.UserLoginRequestDto;
 import com.project.reddit.dto.user.signup.UserSignupRequestDto;
+import com.project.reddit.repository.UserRepository;
 import com.project.reddit.service.PostService;
 import com.project.reddit.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -49,6 +51,16 @@ public class UserController {
     @GetMapping("/{id}/posts")
     public ResponseEntity<?> getAllPostsFromUser(@PathVariable("id") Long id) {
         return new ResponseEntity<>(this.userService.getAllPostsByUser(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/jwt/valid")
+    public ResponseEntity<?> checkIfJwtIsValid(@RequestParam String jwt) {
+        return new ResponseEntity<>(this.userService.checkIfJwtIsValid(jwt), HttpStatus.OK);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<?> searchUsersByName(@RequestParam String name) {
+        return new ResponseEntity<>(this.userService.searchUsersByName(name), HttpStatus.OK);
     }
 
 }

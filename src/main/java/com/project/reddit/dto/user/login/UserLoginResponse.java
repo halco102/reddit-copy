@@ -12,6 +12,6 @@ public class UserLoginResponse {
 
     private String jwt;
 
-    private UserProfileDto userProfileDto;
+    //private UserProfileDto userProfileDto;
 
 }
