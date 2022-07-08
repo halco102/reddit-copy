@@ -3,15 +3,12 @@ package com.project.reddit.service.search;
 import com.project.reddit.exception.BadRequestException;
 import com.project.reddit.exception.NotFoundException;
 import com.project.reddit.model.SearchTypes;
-import com.project.reddit.model.message.Comment;
-import com.project.reddit.model.user.User;
 import com.project.reddit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
