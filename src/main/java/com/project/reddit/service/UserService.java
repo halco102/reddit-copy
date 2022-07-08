@@ -1,5 +1,11 @@
 package com.project.reddit.service;
 
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
+import com.project.reddit.dto.comment.CommentDto;
+import com.project.reddit.dto.comment.LikedOrDislikedCommentsUser;
+import com.project.reddit.dto.comment.UserProfileCommentsWithPostId;
+import com.project.reddit.dto.post.PostLikeOrDislikeDto;
 import com.project.reddit.dto.user.UserProfileDto;
 import com.project.reddit.dto.user.login.UserLoginRequestDto;
 import com.project.reddit.dto.user.login.UserLoginResponse;
@@ -7,6 +13,7 @@ import com.project.reddit.dto.user.signup.UserSignupRequestDto;
 import com.project.reddit.dto.user.signup.UserSignupResponseDto;
 import com.project.reddit.exception.ClassCastException;
 import com.project.reddit.exception.*;
+import com.project.reddit.mapper.CommentMapper;
 import com.project.reddit.mapper.UserMapper;
 import com.project.reddit.model.user.User;
 import com.project.reddit.model.user.UserRole;
@@ -28,8 +35,7 @@ import org.springframework.stereotype.Service;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.time.LocalDate;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,6 +57,8 @@ public class UserService {
     private final JavaMailSender mailSender;
 
     private final Search<User> userSearch;
+
+    private final CommentMapper commentMapper;
 
 
 
@@ -121,18 +129,73 @@ public class UserService {
     }
 
     private UserProfileDto fetchUserProfileById(Long id) {
+
         var userById = userRepository.findById(id);
         if (userById.isEmpty()) {
             throw new NotFoundException("The user with id: " + id + " does not exist");
         }
-        var user = userMapper.userProfileDto(userById.get());
+
+/*        var user = userMapper.userProfileDto(userById.get());
 
         if (userById.get().getLikeDislikes() != null || userById.get().getLikeDislikes().isEmpty()) {
-            var like = userById.get().getLikeDislikes().stream().map(e -> userMapper.likeOrDislike(e)).collect(Collectors.toList());
-            user.setLikedOrDislikedComments(like);
+            user.setLikedOrDislikedComments(getAllLikedOrDislikedCommentsByUser(userById.get()));
         }
 
-        return user;
+        if (userById.get().getPostLikeOrDislikes() != null || userById.get().getPostLikeOrDislikes().isEmpty()) {
+            user.setPostLikeOrDislikeDtos(getAllPostLikeOrDislikeByUser(userById.get()));
+        }
+
+        if (userById.get().getComments() != null || userById.get().getComments().isEmpty()){
+            user.setCommentsPosts(getAllCommentsWithPostId(userById.get()));
+        }*/
+
+        return castToUserProfile(userById);
+    }
+
+    private List<LikedOrDislikedCommentsUser> getAllLikedOrDislikedCommentsByUser(User user) {
+        return user.getLikeDislikes().stream().map(e -> userMapper.likeOrDislike(e)).collect(Collectors.toList());
+    }
+
+    private List<PostLikeOrDislikeDto> getAllPostLikeOrDislikeByUser(User user) {
+        return user.getPostLikeOrDislikes().stream().map(e -> userMapper.postLikeOrDislike(e)).collect(Collectors.toList());
+    }
+
+    private List<UserProfileCommentsWithPostId> getAllCommentsWithPostId(User user) {
+        var commentWithPostId = new ArrayList<UserProfileCommentsWithPostId>();
+
+        Multimap<Long, CommentDto> temp = MultimapBuilder.treeKeys().arrayListValues().build();
+
+        user.getComments().stream()
+                .forEach(e -> {
+                    temp.put(e.getPost().getId(), commentMapper.toDto(e));
+                });
+
+
+        for (var m : temp.asMap().entrySet()) {
+            commentWithPostId.add(new UserProfileCommentsWithPostId(m.getKey(), m.getValue().stream().collect(Collectors.toSet())));
+        }
+
+        return commentWithPostId;
+    }
+
+    private UserProfileDto castToUserProfile(Optional<User> user) {
+
+        var userDto = userMapper.userProfileDto(user.get());
+
+
+        if (user.get().getLikeDislikes() != null || user.get().getLikeDislikes().isEmpty()) {
+            userDto.setLikedOrDislikedComments(getAllLikedOrDislikedCommentsByUser(user.get()));
+        }
+
+        if (user.get().getPostLikeOrDislikes() != null || user.get().getPostLikeOrDislikes().isEmpty()) {
+            userDto.setPostLikeOrDislikeDtos(getAllPostLikeOrDislikeByUser(user.get()));
+        }
+
+        if (user.get().getComments() != null || user.get().getComments().isEmpty()){
+            userDto.setCommentsPosts(getAllCommentsWithPostId(user.get()));
+        }
+
+        return userDto;
     }
 
     private UserProfileDto fetchUserProfileByUsername(String username) {
@@ -143,11 +206,26 @@ public class UserService {
         }
 
         var userByUsername = userRepository.getUserByUsername(username);
+
         if (userByUsername.isEmpty()) {
             throw new NotFoundException("The user with username: " + username + " does not exist!");
         }
 
-        return userMapper.userProfileDto(userByUsername.get());
+/*        var user = userMapper.userProfileDto(userByUsername.get());
+
+        if (userByUsername.get().getLikeDislikes() != null || userByUsername.get().getLikeDislikes().isEmpty()) {
+            user.setLikedOrDislikedComments(getAllLikedOrDislikedCommentsByUser(userByUsername.get()));
+        }
+
+        if (userByUsername.get().getPostLikeOrDislikes() != null || userByUsername.get().getPostLikeOrDislikes().isEmpty()) {
+            user.setPostLikeOrDislikeDtos(getAllPostLikeOrDislikeByUser(userByUsername.get()));
+        }
+
+        if (userByUsername.get().getComments() != null || userByUsername.get().getComments().isEmpty()){
+            user.setCommentsPosts(getAllCommentsWithPostId(userByUsername.get()));
+        }*/
+
+        return castToUserProfile(userByUsername);
     }
 
     public UserProfileDto getUserProfileByUsernameOrId(String username, Long id) {
@@ -165,7 +243,7 @@ public class UserService {
     public UserProfileDto getUserProfileWithJwt() {
         var user = getCurrentlyLoggedUser();
 
-        return userMapper.userProfileDto(user);
+        return castToUserProfile(Optional.of(user));
     }
 
     public User getUserById(Long id) {
@@ -251,6 +329,19 @@ public class UserService {
 
         return searchResults.stream().map(m -> userMapper.userProfileDto(m)).collect(Collectors.toSet());
     }
+
+/*    private UserProfileCommentsWithPostObject setCommentsWithPostReference(User user) {
+
+        Multimap<Post, Comment> multimap = MultimapBuilder.treeKeys().arrayListValues().build();
+        //get all user posts
+        user.getPosts()
+                //for each
+                .stream()
+                .forEach(element -> {
+                    // find comments from specific user and add the post object
+
+                });
+    }*/
 
 
 }

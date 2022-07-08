@@ -1,17 +1,19 @@
 package com.project.reddit.mapper;
 
 import com.project.reddit.dto.comment.LikedOrDislikedCommentsUser;
+import com.project.reddit.dto.post.PostLikeOrDislikeDto;
 import com.project.reddit.dto.user.UserProfileDto;
 import com.project.reddit.dto.user.login.UserLoginResponse;
 import com.project.reddit.dto.user.signup.UserSignupRequestDto;
 import com.project.reddit.dto.user.signup.UserSignupResponseDto;
+import com.project.reddit.model.content.PostLikeOrDislike;
 import com.project.reddit.model.message.CommentLikeDislike;
 import com.project.reddit.model.user.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring", uses = { PostMapper.class })
+@Mapper(componentModel = "spring", uses = { PostMapper.class, CommentMapper.class })
 public interface UserMapper {
 
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
@@ -27,7 +29,12 @@ public interface UserMapper {
     @Mapping(target = "posts", source = "posts")
     UserProfileDto userProfileDto(User user);
     @Mapping(target = "likeOrDislike", source = "likeOrDislike")
-    @Mapping(target = "commentDto", source = "comment")
+    @Mapping(target = "commentId", source = "comment.id")
+    @Mapping(source = "comment.post.id", target = "postId")
     LikedOrDislikedCommentsUser likeOrDislike(CommentLikeDislike commentLikeDislike);
+
+    @Mapping(target = "postId", source = "post.id")
+    @Mapping(target = "likeOrDislike", source = "likeOrDislike")
+    PostLikeOrDislikeDto postLikeOrDislike(PostLikeOrDislike postLikeOrDislike);
 
 }
