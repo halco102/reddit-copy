@@ -8,5 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostLikeOrDislikeDto {
+
+    private Long postId;
+
     private boolean likeOrDislike;
 }
