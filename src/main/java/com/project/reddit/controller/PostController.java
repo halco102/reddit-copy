@@ -4,20 +4,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.reddit.dto.post.PostLikeOrDislikeRequest;
 import com.project.reddit.dto.post.PostRequestDto;
-import com.project.reddit.service.PostService;
+import com.project.reddit.service.post.PostInterface;
+import com.project.reddit.service.post.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.protocol.HTTP;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.web.header.Header;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.validation.Valid;
 
 @RequestMapping("/api/v1/post")
 @RequiredArgsConstructor
@@ -25,11 +21,11 @@ import javax.validation.Valid;
 @Slf4j
 public class PostController {
 
-    private final PostService postService;
+    private final PostInterface postService;
 
     @DeleteMapping
     public ResponseEntity<?> forTestingDeleteAllPosts() {
-        this.postService.deleteAllPosts();
+        //this.postService.deleteAllPosts();
         return new ResponseEntity<>( HttpStatus.OK);
     }
 
@@ -87,9 +83,13 @@ public class PostController {
         return new ResponseEntity<>(this.postService.searchPostByName(name), HttpStatus.OK);
     }
 
-    @GetMapping("/user/{id}")
+/*    @GetMapping("/user/{id}")
     public ResponseEntity<?> filterUsersPosts(@PathVariable Long id) {
         return new ResponseEntity<>(this.postService.filterPostsFromUserProfile(id), HttpStatus.OK);
-    }
+    }*/
 
+    @GetMapping("/category/{categoryName}")
+    public ResponseEntity<?> getAllPostsByCategoryName(@PathVariable String categoryName) {
+        return new ResponseEntity<>(this.postService.getAllPostByCategoryName(categoryName), HttpStatus.OK);
+    }
 }

@@ -1,4 +1,4 @@
-package com.project.reddit.service;
+package com.project.reddit.service.post;
 
 import com.project.reddit.dto.post.PostDto;
 import com.project.reddit.dto.post.PostLikeOrDislikeRequest;
@@ -12,11 +12,13 @@ import com.project.reddit.model.content.Post;
 import com.project.reddit.model.content.PostLikeOrDislike;
 import com.project.reddit.model.user.User;
 import com.project.reddit.repository.PostRepository;
+import com.project.reddit.service.cloudinary.CloudinaryService;
 import com.project.reddit.service.search.FilterUserContent;
 import com.project.reddit.service.search.Search;
+import com.project.reddit.service.sorting.SortingCommentsInterface;
+import com.project.reddit.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,11 +27,12 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor(onConstructor = @__(@Lazy))
-public class PostService {
+@RequiredArgsConstructor()
+public class PostService implements PostInterface{
 
     private final PostRepository postRepository;
     private final PostMapper postMapper;
+
     private final UserService userService;
     private final CloudinaryService cloudinaryService;
 
@@ -50,7 +53,6 @@ public class PostService {
     * */
     public PostDto savePost(PostRequestDto requestDto, MultipartFile file) {
 
-        //var getUserById = userService.getUserById(requestDto.getUserId());
         var user = userService.getCurrentlyLoggedUser();
 
 
@@ -59,6 +61,10 @@ public class PostService {
         }else if (file != null) {
             // upload file and get url
             requestDto.setImageUrl(cloudinaryService.getUrlFromUploadedMedia(file));
+        }
+
+        if (requestDto.getCategories() == null || requestDto.getCategories().isEmpty()) {
+            throw new BadRequestException("Categories are empty!");
         }
 
         Post post = postMapper.toEntity(requestDto);
@@ -110,7 +116,7 @@ public class PostService {
         return posts;
     }
 
-    public Post findPostById(Long id) {
+    public Post getPostEntityById(Long id) {
         return this.postRepository.findById(id).orElseThrow(
                 () -> {throw new NotFoundException("The post of id: " + id + " cannot be found");});
     }
@@ -239,6 +245,10 @@ public class PostService {
         return this.filterUserContent.filterUserContent(userId, SearchTypes.POST).stream().map(e -> postMapper.toPostDto(e)).collect(Collectors.toList());
     }
 
-
-
+    @Override
+    public List<PostDto> getAllPostByCategoryName(String categoryName) {
+        var temp = postRepository.getAllPostByCategoryName(categoryName);
+        return this.postRepository.getAllPostByCategoryName(categoryName).stream()
+                .map(m -> postMapper.toPostDto(m)).collect(Collectors.toList());
+    }
 }

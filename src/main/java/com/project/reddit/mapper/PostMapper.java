@@ -8,7 +8,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.ArrayList;
 
-@Mapper(componentModel = "spring", uses = {CommentMapper.class})
+@Mapper(componentModel = "spring", uses = {CommentMapper.class, CategoryMapper.class})
 public interface PostMapper {
 
     PostMapper INSTANCE = Mappers.getMapper(PostMapper.class);
