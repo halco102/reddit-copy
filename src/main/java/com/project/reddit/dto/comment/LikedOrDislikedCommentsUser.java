@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LikedOrDislikedCommentsUser {
 
-    private CommentDto commentDto;
+    private Long postId;
+
+    private Long commentId;
 
     private boolean likeOrDislike;
 
