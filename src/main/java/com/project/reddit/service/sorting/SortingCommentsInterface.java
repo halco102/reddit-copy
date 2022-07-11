@@ -1,4 +1,4 @@
-package com.project.reddit.service;
+package com.project.reddit.service.sorting;
 
 import com.project.reddit.dto.comment.CommentDto;
 

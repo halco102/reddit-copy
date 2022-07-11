@@ -1,7 +1,5 @@
 package com.project.reddit.service;
 
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.MultimapBuilder;
 import com.project.reddit.dto.comment.CommentDto;
 import com.project.reddit.dto.comment.CommentRequest;
 import com.project.reddit.dto.comment.EditCommentDto;
@@ -14,7 +12,10 @@ import com.project.reddit.model.message.CommentLikeDislike;
 import com.project.reddit.model.message.EmbedableCommentLikeDislikeId;
 import com.project.reddit.model.user.User;
 import com.project.reddit.repository.CommentRepository;
+import com.project.reddit.service.post.PostService;
 import com.project.reddit.service.search.FilterUserContent;
+import com.project.reddit.service.sorting.SortingCommentsInterface;
+import com.project.reddit.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -49,7 +50,7 @@ public class CommentService {
         var findUser = userService.getCurrentlyLoggedUser();
 
         //find the current post, if there isn't one it will throw an exception
-        var findPost = this.postService.findPostById(request.getPostId());
+        var findPost = this.postService.getPostEntityById(request.getPostId());
 
         // map the request to entity and add set objects
         Comment comment = commentMapper.toEntity(request);

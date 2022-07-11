@@ -1,4 +1,4 @@
-package com.project.reddit.service;
+package com.project.reddit.service.sorting;
 
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
-public class SortingComments implements SortingCommentsInterface{
+public class SortingComments implements SortingCommentsInterface {
 
     /*
      *This method is used for sorting comments by parentId,

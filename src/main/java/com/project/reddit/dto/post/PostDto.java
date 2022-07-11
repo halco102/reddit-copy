@@ -1,5 +1,6 @@
 package com.project.reddit.dto.post;
 
+import com.project.reddit.dto.category.CategoryDto;
 import com.project.reddit.dto.comment.CommentDto;
 import com.project.reddit.dto.user.UserInfo;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -35,5 +37,7 @@ public class PostDto {
     private boolean allowComments;
 
     private List<PostLikeOrDislikeDto> postLikeOrDislikeDtos = new ArrayList<>();
+
+    private Set<CategoryDto> categories;
 
 }

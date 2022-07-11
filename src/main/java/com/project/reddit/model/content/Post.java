@@ -1,6 +1,7 @@
 package com.project.reddit.model.content;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.project.reddit.model.category.Category;
 import com.project.reddit.model.message.Comment;
 import com.project.reddit.model.user.User;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -45,6 +47,14 @@ public class Post {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostLikeOrDislike> postLikeOrDislikes;
+
+
+    @ManyToMany
+    @JoinTable(
+            name = "post_categories",
+            joinColumns = @JoinColumn(name = "posts_id"), inverseJoinColumns = @JoinColumn(name = "categories_id")
+    )
+    private Set<Category> categories;
 
     public Post(Long id, String title, String text, String imageUrl, boolean allowComments, User user) {
         this.id = id;

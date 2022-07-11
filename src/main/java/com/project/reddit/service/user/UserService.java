@@ -1,4 +1,4 @@
-package com.project.reddit.service;
+package com.project.reddit.service.user;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
@@ -288,11 +288,10 @@ public class UserService {
 
     }
 
-    protected User getCurrentlyLoggedUser() {
+    public User getCurrentlyLoggedUser() {
+
         User user = null;
         String username = null;
-
-        var temp = SecurityContextHolder.getContext();
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
