@@ -26,6 +26,9 @@ public class Category {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "icon_url")
+    private String iconUrl;
+
     @ManyToMany
     @JsonIgnore
     private List<Post> posts;

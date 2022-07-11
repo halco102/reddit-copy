@@ -43,6 +43,8 @@ public class CloudinaryService {
         }
     }
 
+ //todo add delete method, so when a user deletes his post the file in cloudinary should be deleted
+
 
 
 }
