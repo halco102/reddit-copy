@@ -34,7 +34,10 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         String getOrigin = request.getHeader("Origin");
-        List<String> allowedOrigins = new ArrayList<>(Arrays.asList("http://localhost:8081", "chrome-extension://cbcbkhdmedgianpaifchdaddpnmgnknn", "https://demo-reddit-admir-halilovic.herokuapp.com/"));
+        List<String> allowedOrigins = new ArrayList<>(Arrays.asList("http://localhost:8081",
+                "chrome-extension://cbcbkhdmedgianpaifchdaddpnmgnknn",
+                "https://demo-reddit-admir-halilovic.herokuapp.com/",
+                "https://development-reddit-frontend.herokuapp.com/"));
 
 
 //        response.addHeader("Access-Control-Allow-Origin", allowedOrigins.contains(getOrigin) ? request.getHeader("Origin") : "*");
