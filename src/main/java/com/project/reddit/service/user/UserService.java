@@ -23,6 +23,7 @@ import com.project.reddit.security.JwtTokenUtil;
 import com.project.reddit.service.search.Search;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,6 +35,7 @@ import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -60,8 +62,12 @@ public class UserService {
 
     private final CommentMapper commentMapper;
 
+    @Value("${MAIL_USERNAME}")
+    private String email;
 
 
+
+    @Transactional
     public UserSignupResponseDto signupUser(UserSignupRequestDto signupRequest) {
 
         var user = userMapper.signupToEntity(signupRequest);
@@ -94,7 +100,7 @@ public class UserService {
         String verifyUrl = "https://demo-reddit-project.herokuapp.com/api/v1/user/verify/" + user.getVerificationCode();
 
         String toAddress = user.getEmail();
-        String fromAddress = "admir_halilovic@outlook.com";
+        String fromAddress = email;
         String subject = "Successfully register in Reddit copy app ";
         String content = "Dear " + user.getUsername() + " thank you for signin up my project website.\n\n" +
                 "Please follow this link <a href =" + verifyUrl + "> Verify here </a>"+ " <br>" +
