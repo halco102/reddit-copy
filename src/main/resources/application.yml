@@ -4,19 +4,26 @@ logging:
   level:
     org.springframework.web: DEBUG
 spring:
-  server.port: ${SERVER_PORT}
+  server.port: ${8082:PORT}
+
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 25MB
   h2:
     console:
       enabled: false
       path: /h2
 
   datasource:
-    #postgres
-    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+
     driver-class-name: org.postgresql.Driver
     platform: postgres
+
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+
     #end postgres conf
 
     #h2
@@ -25,11 +32,15 @@ spring:
     #password: password
     #driverClassName: org.h2.Driver
     #end h2 datasource conf
+
   flyway:
     enabled: true
+
+    #deployed postgres
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
     user: ${DB_USERNAME}
     password: ${DB_PASSWORD}
-    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+
     locations: classpath:db/migration
     check-location: true
     baseline-on-migrate: false
@@ -41,10 +52,10 @@ spring:
 
   ### SMTP ###
   mail:
-    host: smtp.gmail.com
+    host: smtp.office365.com
     port: 587
-    username: ${GMAIL_USERNAME}
-    password: ${GMAIL_PASSWORD}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -66,5 +77,4 @@ cloudinary-api-key: ${CLOUDINARY_API_KEY}
 cloudinary-secret-key: ${CLOUDINARY_SECRET_KEY}
 cloudinary-name: ${CLOUDINARY_NAME}
 jwt-secret-key: ${JWT_SECRET_KEY}
-
 

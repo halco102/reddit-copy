@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -37,6 +38,12 @@ public class Post {
 
     @Column(name = "allow_comments")
     private boolean allowComments;
+
+    @Column(name = "created_at")
+    private Date createdAt;
+
+    @Column(name = "edited_at")
+    private Date editedAt;
 
     @ManyToOne
     @JoinColumn(name = "users_id", referencedColumnName = "id")

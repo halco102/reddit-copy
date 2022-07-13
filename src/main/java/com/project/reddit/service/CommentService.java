@@ -7,11 +7,14 @@ import com.project.reddit.dto.comment.LikeOrDislikeCommentRequest;
 import com.project.reddit.exception.NotFoundException;
 import com.project.reddit.mapper.CommentMapper;
 import com.project.reddit.model.SearchTypes;
+import com.project.reddit.model.content.Post;
 import com.project.reddit.model.message.Comment;
 import com.project.reddit.model.message.CommentLikeDislike;
 import com.project.reddit.model.message.EmbedableCommentLikeDislikeId;
 import com.project.reddit.model.user.User;
 import com.project.reddit.repository.CommentRepository;
+import com.project.reddit.service.comment.DeleteComment;
+import com.project.reddit.service.post.PostInterface;
 import com.project.reddit.service.post.PostService;
 import com.project.reddit.service.search.FilterUserContent;
 import com.project.reddit.service.sorting.SortingCommentsInterface;
@@ -28,12 +31,13 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class CommentService {
+public class CommentService implements DeleteComment {
 
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
     private final UserService userService;
-    private final PostService postService;
+
+    private final PostInterface postInterface;
 
     private final SortingCommentsInterface sortingCommentsInterface;
 
@@ -50,7 +54,7 @@ public class CommentService {
         var findUser = userService.getCurrentlyLoggedUser();
 
         //find the current post, if there isn't one it will throw an exception
-        var findPost = this.postService.getPostEntityById(request.getPostId());
+        var findPost = this.postInterface.getPostEntityById(request.getPostId());
 
         // map the request to entity and add set objects
         Comment comment = commentMapper.toEntity(request);
@@ -216,4 +220,11 @@ public class CommentService {
     public List<CommentDto> filterUserComments(Long userId) {
         return this.filterUserContent.filterUserContent(userId, SearchTypes.COMMENTS).stream().map(e -> commentMapper.toDto(e)).collect(Collectors.toList());
     }
+
+    @Override
+    public void deleteAllCommentsByPostId(Post post) {
+        var getComments = post.getComments();
+        getComments.stream().forEach(item -> deleteCommentById(item.getId()));
+    }
+
 }
