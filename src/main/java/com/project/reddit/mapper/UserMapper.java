@@ -13,7 +13,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring", uses = { PostMapper.class, CommentMapper.class })
+@Mapper(componentModel = "spring", uses = { PostMapper.class, CommentMapper.class, CategoryMapper.class })
 public interface UserMapper {
 
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);

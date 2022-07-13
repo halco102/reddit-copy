@@ -3,8 +3,10 @@ package com.project.reddit.service.post;
 import com.project.reddit.dto.post.PostDto;
 import com.project.reddit.dto.post.PostLikeOrDislikeRequest;
 import com.project.reddit.dto.post.PostRequestDto;
+import com.project.reddit.dto.post.UpdatePostDto;
 import com.project.reddit.exception.BadRequestException;
 import com.project.reddit.exception.NotFoundException;
+import com.project.reddit.mapper.CategoryMapper;
 import com.project.reddit.mapper.PostMapper;
 import com.project.reddit.model.SearchTypes;
 import com.project.reddit.model.content.EmbedablePostLikeOrDislikeId;
@@ -28,7 +30,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor()
-public class PostService implements PostInterface{
+public class PostService implements PostInterface, PostLikeDislike, PostCategory{
 
     private final PostRepository postRepository;
     private final PostMapper postMapper;
@@ -41,6 +43,9 @@ public class PostService implements PostInterface{
     private final Search<Post> postSearch;
 
     private final FilterUserContent<Post> filterUserContent;
+
+
+    private final CategoryMapper categoryMapper;
 
 
 
@@ -71,6 +76,7 @@ public class PostService implements PostInterface{
 
         post.setAllowComments(requestDto.isAllowComments());
         post.setUser(user);
+        post.setCreatedAt(new Date(System.currentTimeMillis()));
 
         var savedPost = this.postRepository.save(post);
         log.info("Post is saved " + savedPost);
@@ -250,5 +256,34 @@ public class PostService implements PostInterface{
         var temp = postRepository.getAllPostByCategoryName(categoryName);
         return this.postRepository.getAllPostByCategoryName(categoryName).stream()
                 .map(m -> postMapper.toPostDto(m)).collect(Collectors.toList());
+    }
+
+    @Override
+    public PostDto updatePostById(Long id, UpdatePostDto request) {
+
+        var findPost = getPostEntityById(id);
+
+        findPost.setTitle(!request.getTitle().isBlank() ? request.getTitle() : findPost.getTitle());
+        findPost.setText(!request.getText().isBlank() && request.getText() != null ? request.getText() : findPost.getText());
+
+        if (findPost.isAllowComments() != request.isAllowComments()) {
+            if (!request.isAllowComments()) {
+                // false
+                //delete all comments from post
+                findPost.getComments().clear();
+            }
+
+            findPost.setAllowComments(request.isAllowComments());
+        }
+
+        findPost.getCategories().clear();
+
+        request.getCategories().forEach(cat -> findPost.getCategories().add(categoryMapper.toCategoryEntity(cat)));
+
+        findPost.setEditedAt(new Date(System.currentTimeMillis()));
+
+        var savedPost = postRepository.save(findPost);
+
+        return postMapper.toPostDto(savedPost);
     }
 }

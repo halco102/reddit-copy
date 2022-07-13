@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.reddit.dto.post.PostLikeOrDislikeRequest;
 import com.project.reddit.dto.post.PostRequestDto;
-import com.project.reddit.service.post.PostInterface;
+import com.project.reddit.dto.post.UpdatePostDto;
 import com.project.reddit.service.post.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 public class PostController {
 
-    private final PostInterface postService;
+    private final PostService postService;
 
     @DeleteMapping
     public ResponseEntity<?> forTestingDeleteAllPosts() {
@@ -92,4 +92,10 @@ public class PostController {
     public ResponseEntity<?> getAllPostsByCategoryName(@PathVariable String categoryName) {
         return new ResponseEntity<>(this.postService.getAllPostByCategoryName(categoryName), HttpStatus.OK);
     }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updatePostById(@PathVariable Long id, @RequestBody UpdatePostDto request){
+        return new ResponseEntity<>(this.postService.updatePostById(id, request), HttpStatus.OK);
+    }
+
 }

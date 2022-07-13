@@ -5,23 +5,22 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostForFrontPageDto {
+public class UpdatePostDto {
 
-    private Long id;
-
+    @NotBlank
+    @NotNull
     private String title;
 
     private String text;
 
-    private String imageUrl;
-
-    private List<PostLikeOrDislikeDto> postLikeOrDislikeDtos;
+    private boolean allowComments;
 
     private Set<CategoryDto> categories;
 
