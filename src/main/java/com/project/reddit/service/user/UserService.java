@@ -65,6 +65,9 @@ public class UserService {
     @Value("${MAIL_USERNAME}")
     private String email;
 
+    @Value("${VERIFY_EMAIL_URL}")
+    private String verifyEmailUrl;
+
 
 
     @Transactional
@@ -97,10 +100,10 @@ public class UserService {
     }
 
     private void sendVerificationEmail(User user) throws MessagingException {
-        String verifyUrl = "https://demo-reddit-project.herokuapp.com/api/v1/user/verify/" + user.getVerificationCode();
+        String verifyUrl = verifyEmailUrl + "/api/v1/user/verify/" + user.getVerificationCode();
 
         String toAddress = user.getEmail();
-        String fromAddress = email;
+        String fromAddress = this.email;
         String subject = "Successfully register in Reddit copy app ";
         String content = "Dear " + user.getUsername() + " thank you for signin up my project website.\n\n" +
                 "Please follow this link <a href =" + verifyUrl + "> Verify here </a>"+ " <br>" +

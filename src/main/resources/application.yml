@@ -77,4 +77,5 @@ cloudinary-api-key: ${CLOUDINARY_API_KEY}
 cloudinary-secret-key: ${CLOUDINARY_SECRET_KEY}
 cloudinary-name: ${CLOUDINARY_NAME}
 jwt-secret-key: ${JWT_SECRET_KEY}
+verify-email-url: ${VERIFY_EMAIL_URL}
 
