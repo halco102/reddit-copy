@@ -4,6 +4,9 @@ import com.project.reddit.dto.post.PostForFrontPageDto;
 import com.project.reddit.dto.user.UserProfileDto;
 import com.project.reddit.dto.user.login.UserLoginRequestDto;
 import com.project.reddit.dto.user.login.UserLoginResponse;
+import com.project.reddit.dto.user.signup.UserSignupRequestDto;
+import com.project.reddit.exception.BadRequestException;
+import com.project.reddit.exception.DuplicateException;
 import com.project.reddit.exception.NotFoundException;
 import com.project.reddit.exception.Unauthorized;
 import com.project.reddit.mapper.CommentMapper;
@@ -23,10 +26,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -73,20 +73,29 @@ class UserServiceTest {
     private Authentication authentication = Mockito.mock(Authentication.class);
 
     private User userObject;
+    private UserSignupRequestDto userSignupRequestDto;
 
     @BeforeEach
     void beforeEach() {
         when(userMapper.signupToEntity(Mockito.any()))
-                .thenReturn(new User("halco1002", "987456321aa", "ado.halilovic@outlook.com" ));
+                .thenReturn(new User("halco1002", "987456321aa", "email@email.com" ));
 
-        userObject = new User(1L, "halco1002", "987456321aa", "ado.halilovic@outlook.com", LocalDate.now(), "image", UserRole.ROLE_USER);
+        userObject = new User(1L, "halco1002", "987456321aa", "email.@email.com", LocalDate.now(), "image", UserRole.ROLE_USER);
+        userSignupRequestDto = new UserSignupRequestDto("halco1002", "987456321aa", "email@email.com");
     }
 
+    @Test
+    void testDuplicateExceptionOnSignup() {
+        when(userRepository.getUserByEmail("email@email.com")).thenReturn(Optional.ofNullable(userObject));
 
- /*   @Test
-    void signupUser() {
+        Assertions.assertThrows(DuplicateException.class, () -> userService.signupUser(userSignupRequestDto));
 
-        UserSignupRequestDto userSignupRequestDto = new UserSignupRequestDto("halco1002", "ado.halilovic@outlook.com", "987456321aa");
+        when(userRepository.getUserByUsername("halco1002")).thenReturn(Optional.ofNullable(userObject));
+        Assertions.assertThrows(DuplicateException.class, () -> userService.signupUser(userSignupRequestDto));
+    }
+
+    @Test
+    void testSignupUser() {
 
         var user = userMapper.signupToEntity(userSignupRequestDto);
 
@@ -96,29 +105,36 @@ class UserServiceTest {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setUserRole(UserRole.ROLE_USER);
         user.setVerificationCode(String.valueOf(UUID.randomUUID()));
-        AtomicReference<UserSignupResponseDto> userSignupResponseDto = new AtomicReference<>();
 
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> userSignupResponseDto.set(userService.signupUser(userSignupRequestDto)), "Expected throw bcs private method");
-
-        Assertions.assertNotNull(userSignupResponseDto.get());
-        Assertions.assertEquals(user.getEmail(), userSignupResponseDto.get().getEmail());
-        Assertions.assertEquals(user.getUsername(), userSignupResponseDto.get().getUsername());
-
-
-
-    }*/
-
-    @Test
-    void verifieUserViaEmail() {
     }
 
     @Test
-    void getUserProfileByUsernameOrId() {
+    void testVerifieUserViaEmail() {
+
+        when(userRepository.verifieUserCode(Mockito.anyString())).thenReturn(Optional.ofNullable(userObject));
+
+        when(userRepository.save(Mockito.any())).thenReturn(userObject);
+
+        var verify = userService.verifieUserViaEmail("123");
+
+        var saveUser = userRepository.save(userObject);
+
+        Assertions.assertNotNull(verify);
+
+        Assertions.assertNotNull(saveUser);
+
+        Assertions.assertEquals("Verified continue to vue website http://localhost:8081/", verify);
+
+        Assertions.assertEquals(userObject.getId(), saveUser.getId());
+
     }
 
     @Test
-    void getUserProfileWithJwt() {
+    void testBadRequestExceptionOnVerifyEmail() {
+        when(userRepository.verifieUserCode(Mockito.anyString())).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(BadRequestException.class, () -> userService.verifieUserViaEmail("123"));
     }
 
     @Test
@@ -134,13 +150,9 @@ class UserServiceTest {
     }
 
     @Test
-    void checkIfEmailOrUsername() {
-    }
-
-    @Test
     void testUserLogin() {
 
-        when(userRepository.getUserByUsername("halco1002")).thenReturn(Optional.ofNullable(userObject));
+        when(userRepository.getUserByUsername(userObject.getUsername())).thenReturn(Optional.ofNullable(userObject));
 
         when(jwtTokenUtil.generateJwtToken(Mockito.any())).thenReturn("123");
 
@@ -171,12 +183,6 @@ class UserServiceTest {
 
         Assertions.assertNotEquals(userObject.getPassword(), "wrongpassword");
         Assertions.assertThrows(Unauthorized.class, () -> userService.userLogin(new UserLoginRequestDto("halco1002", "wrongpass")));
-    }
-
-
-
-    @Test
-    void getCurrentlyLoggedUser() {
     }
 
     @Test
@@ -212,11 +218,4 @@ class UserServiceTest {
         Assertions.assertEquals(userObject.getPosts().size(), userProfile.getPosts().size());
     }
 
-    @Test
-    void checkIfJwtIsValid() {
-    }
-
-    @Test
-    void searchUsersByName() {
-    }
 }
