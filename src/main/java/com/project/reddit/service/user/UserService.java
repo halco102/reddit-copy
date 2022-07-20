@@ -38,6 +38,8 @@ import javax.mail.internet.MimeMessage;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -67,6 +69,8 @@ public class UserService {
 
     @Value("${VERIFY_EMAIL_URL}")
     private String verifyEmailUrl;
+
+
 
 
 
@@ -101,7 +105,7 @@ public class UserService {
 
     private void sendVerificationEmail(User user) throws MessagingException {
         String verifyUrl = verifyEmailUrl + "/api/v1/user/verify/" + user.getVerificationCode();
-
+        
         String toAddress = user.getEmail();
         String fromAddress = this.email;
         String subject = "Successfully register in Reddit copy app ";
@@ -264,24 +268,43 @@ public class UserService {
         return user.orElseThrow(() -> {throw new NotFoundException("The user with id: " + id + " does not exist");});
     }
 
+    /*
+    * true = email
+    * false = username
+    * */
+    public boolean checkIfEmailOrUsername(String emailOrUsername) {
+        Pattern pattern = Pattern.compile("(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])");
+        Matcher matcher = pattern.matcher(emailOrUsername);
+
+        return matcher.matches();
+    }
+
+
+
     public UserLoginResponse userLogin(UserLoginRequestDto requestDto) {
 
-        var getUserByEmail = this.userRepository.getUserByEmail(requestDto.getEmail().trim());
+        Optional<User> getUser = null;
 
-        if(getUserByEmail.isEmpty()){
-            throw new NotFoundException("The user with email: " + requestDto.getEmail().trim() + " does not exist");
+        if (checkIfEmailOrUsername(requestDto.getEmailOrUsername())) {
+            getUser = this.userRepository.getUserByEmail(requestDto.getEmailOrUsername().trim());
+        }else {
+            getUser = this.userRepository.getUserByUsername(requestDto.getEmailOrUsername());
         }
 
-        if (passwordEncoder.matches(requestDto.getPassword(), getUserByEmail.get().getPassword())) {
+        if(getUser.isEmpty()){
+            throw new NotFoundException("The user with email: " + requestDto.getEmailOrUsername().trim() + " does not exist");
+        }
+
+        if (passwordEncoder.matches(requestDto.getPassword(), getUser.get().getPassword())) {
             log.info("Password match");
 
-            if (!getUserByEmail.get().isVerified()){
+            if (!getUser.get().isVerified()){
                 throw new BadRequestException("Verify email to login");
             }
 
             UserLoginResponse userLoginResponse = new UserLoginResponse();
             Authentication auth = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(getUserByEmail.get().getUsername(), requestDto.getPassword())
+                    new UsernamePasswordAuthenticationToken(getUser.get().getUsername(), requestDto.getPassword())
             );
                     //new UsernamePasswordAuthenticationToken(getUserByEmail.get().getUsername(), passwordEncoder.encode(getUserByEmail.get().getPassword()));
             SecurityContextHolder.getContext().setAuthentication(auth);
