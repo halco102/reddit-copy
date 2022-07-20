@@ -3,9 +3,7 @@ package com.project.reddit.service.category;
 import com.project.reddit.dto.category.CategoryDto;
 import com.project.reddit.dto.category.CategoryRequestDto;
 import com.project.reddit.mapper.CategoryMapper;
-import com.project.reddit.model.category.Category;
 import com.project.reddit.repository.CategoryRepository;
-import com.project.reddit.service.post.PostInterface;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,8 +19,6 @@ public class CategoryService implements CategoryInterface{
     private final CategoryRepository categoryRepository;
 
     private final CategoryMapper categoryMapper;
-
-    private final PostInterface postInterface;
 
     @Override
     public List<CategoryDto> getAllCategories() {

@@ -292,7 +292,7 @@ public class UserService {
         }
 
         if(getUser.isEmpty()){
-            throw new NotFoundException("The user with email: " + requestDto.getEmailOrUsername().trim() + " does not exist");
+            throw new NotFoundException("The user with email or username: " + requestDto.getEmailOrUsername().trim() + " does not exist");
         }
 
         if (passwordEncoder.matches(requestDto.getPassword(), getUser.get().getPassword())) {
@@ -302,11 +302,9 @@ public class UserService {
                 throw new BadRequestException("Verify email to login");
             }
 
-            UserLoginResponse userLoginResponse = new UserLoginResponse();
             Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(getUser.get().getUsername(), requestDto.getPassword())
             );
-                    //new UsernamePasswordAuthenticationToken(getUserByEmail.get().getUsername(), passwordEncoder.encode(getUserByEmail.get().getPassword()));
             SecurityContextHolder.getContext().setAuthentication(auth);
 
             var mapper = userMapper.userLoginResponseDto(jwtTokenUtil.generateJwtToken(auth));
