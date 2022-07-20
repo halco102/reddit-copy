@@ -94,7 +94,7 @@ class UserServiceTest {
         Assertions.assertThrows(DuplicateException.class, () -> userService.signupUser(userSignupRequestDto));
     }
 
-    @Test
+/*    @Test
     void testSignupUser() {
 
         var user = userMapper.signupToEntity(userSignupRequestDto);
@@ -106,8 +106,11 @@ class UserServiceTest {
         user.setUserRole(UserRole.ROLE_USER);
         user.setVerificationCode(String.valueOf(UUID.randomUUID()));
 
+        // not sure how to get into the private method, bad design ? Maybe change it to public (sendVerificationEmail)
 
-    }
+
+
+    }*/
 
     @Test
     void testVerifieUserViaEmail() {
