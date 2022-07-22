@@ -20,7 +20,6 @@ import com.project.reddit.model.user.UserRole;
 import com.project.reddit.repository.UserRepository;
 import com.project.reddit.security.CustomUserDetailsImp;
 import com.project.reddit.security.JwtTokenUtil;
-import com.project.reddit.service.search.Search;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,7 +36,10 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -59,8 +61,6 @@ public class UserService {
     private final String RANDOM_AVATAR_URL="https://avatars.dicebear.com/api/bottts/";
 
     private final JavaMailSender mailSender;
-
-    private final Search<User> userSearch;
 
     private final CommentMapper commentMapper;
 
@@ -352,25 +352,6 @@ public class UserService {
     public boolean checkIfJwtIsValid(String jwt) {
         return this.jwtTokenUtil.validateToken(jwt);
     }
-
-    public Set<UserProfileDto> searchUsersByName(String name) {
-        var searchResults = this.userSearch.search(name);
-
-        return searchResults.stream().map(m -> userMapper.userProfileDto(m)).collect(Collectors.toSet());
-    }
-
-/*    private UserProfileCommentsWithPostObject setCommentsWithPostReference(User user) {
-
-        Multimap<Post, Comment> multimap = MultimapBuilder.treeKeys().arrayListValues().build();
-        //get all user posts
-        user.getPosts()
-                //for each
-                .stream()
-                .forEach(element -> {
-                    // find comments from specific user and add the post object
-
-                });
-    }*/
 
 
 }

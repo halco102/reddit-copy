@@ -14,8 +14,8 @@ public class SearchController {
 
     private final SearchContext searchContext;
 
-    @GetMapping("/{content}")
-    public ResponseEntity<?> searchPostOrUser(@PathVariable String content, @RequestParam SearchType searchType) {
+    @GetMapping("")
+    public ResponseEntity<?> searchPostOrUser(@RequestParam String content, @RequestParam SearchType searchType) {
         return new ResponseEntity<>(this.searchContext.getSearchResult(searchType, content), HttpStatus.OK);
     }
 

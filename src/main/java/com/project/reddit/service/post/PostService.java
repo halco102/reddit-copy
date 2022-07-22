@@ -1,5 +1,6 @@
 package com.project.reddit.service.post;
 
+import com.project.reddit.constants.UserProfileSearchType;
 import com.project.reddit.dto.likeordislike.LikeOrDislikeRequest;
 import com.project.reddit.dto.post.PostDto;
 import com.project.reddit.dto.post.PostRequestDto;
@@ -8,14 +9,12 @@ import com.project.reddit.exception.BadRequestException;
 import com.project.reddit.exception.NotFoundException;
 import com.project.reddit.mapper.CategoryMapper;
 import com.project.reddit.mapper.PostMapper;
-import com.project.reddit.constants.UserProfileSearchType;
 import com.project.reddit.model.content.Post;
 import com.project.reddit.repository.PostRepository;
 import com.project.reddit.service.cloudinary.CloudinaryService;
 import com.project.reddit.service.likedislike.PostLikeOrDislikeService;
 import com.project.reddit.service.likedislike.SimpleLikeOrDislikeFactory;
 import com.project.reddit.service.search.FilterUserContent;
-import com.project.reddit.service.search.Search;
 import com.project.reddit.service.sorting.SortingCommentsInterface;
 import com.project.reddit.service.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,8 +40,6 @@ public class PostService implements PostInterface, PostCategory{
     private final CloudinaryService cloudinaryService;
 
     private final SortingCommentsInterface sortingCommentsInterface;
-
-    private final Search<Post> postSearch;
 
     private final FilterUserContent<Post> filterUserContent;
 
@@ -194,11 +194,6 @@ public class PostService implements PostInterface, PostCategory{
         }
 
         return sortByNumberOfDislikes.stream().map(e -> postMapper.toPostDto(e)).collect(Collectors.toList());
-    }
-
-    public Set<PostDto> searchPostByName(String name) {
-        var search =  postSearch.search(name);
-        return search.stream().map(m -> postMapper.toPostDto(m)).collect(Collectors.toSet());
     }
 
     public List<PostDto> filterPostsFromUserProfile(Long userId) {
