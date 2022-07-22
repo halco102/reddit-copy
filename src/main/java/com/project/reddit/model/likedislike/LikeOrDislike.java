@@ -2,8 +2,9 @@ package com.project.reddit.model.likedislike;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.reddit.model.user.User;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 

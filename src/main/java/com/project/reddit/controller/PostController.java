@@ -24,11 +24,6 @@ public class PostController {
 
     private final PostService postService;
 
-    @DeleteMapping
-    public ResponseEntity<?> forTestingDeleteAllPosts() {
-        //this.postService.deleteAllPosts();
-        return new ResponseEntity<>( HttpStatus.OK);
-    }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
     @PostMapping(value = "", consumes = {  MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE }, produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -79,10 +74,7 @@ public class PostController {
         return new ResponseEntity<>(this.postService.sortPostByNumberOfDislikes(), HttpStatus.OK);
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<?> searchPostsByName(@RequestParam String name) {
-        return new ResponseEntity<>(this.postService.searchPostByName(name), HttpStatus.OK);
-    }
+
 
 /*    @GetMapping("/user/{id}")
     public ResponseEntity<?> filterUsersPosts(@PathVariable Long id) {
