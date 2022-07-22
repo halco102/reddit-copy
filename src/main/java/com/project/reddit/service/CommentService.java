@@ -6,7 +6,7 @@ import com.project.reddit.dto.comment.EditCommentDto;
 import com.project.reddit.dto.likeordislike.CommentLikeOrDislikeRequest;
 import com.project.reddit.exception.NotFoundException;
 import com.project.reddit.mapper.CommentMapper;
-import com.project.reddit.model.SearchTypes;
+import com.project.reddit.constants.UserProfileSearchType;
 import com.project.reddit.model.content.Post;
 import com.project.reddit.model.message.Comment;
 import com.project.reddit.repository.CommentRepository;
@@ -151,7 +151,7 @@ public class CommentService implements DeleteComment {
 
 
     public List<CommentDto> filterUserComments(Long userId) {
-        return this.filterUserContent.filterUserContent(userId, SearchTypes.COMMENTS).stream().map(e -> commentMapper.toDto(e)).collect(Collectors.toList());
+        return this.filterUserContent.filterUserContent(userId, UserProfileSearchType.COMMENTS).stream().map(e -> commentMapper.toDto(e)).collect(Collectors.toList());
     }
 
     @Override

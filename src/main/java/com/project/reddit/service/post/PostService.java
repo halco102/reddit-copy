@@ -8,7 +8,7 @@ import com.project.reddit.exception.BadRequestException;
 import com.project.reddit.exception.NotFoundException;
 import com.project.reddit.mapper.CategoryMapper;
 import com.project.reddit.mapper.PostMapper;
-import com.project.reddit.model.SearchTypes;
+import com.project.reddit.constants.UserProfileSearchType;
 import com.project.reddit.model.content.Post;
 import com.project.reddit.repository.PostRepository;
 import com.project.reddit.service.cloudinary.CloudinaryService;
@@ -202,7 +202,7 @@ public class PostService implements PostInterface, PostCategory{
     }
 
     public List<PostDto> filterPostsFromUserProfile(Long userId) {
-        return this.filterUserContent.filterUserContent(userId, SearchTypes.POST).stream().map(e -> postMapper.toPostDto(e)).collect(Collectors.toList());
+        return this.filterUserContent.filterUserContent(userId, UserProfileSearchType.POST).stream().map(e -> postMapper.toPostDto(e)).collect(Collectors.toList());
     }
 
     @Override

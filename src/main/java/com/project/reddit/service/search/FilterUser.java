@@ -2,7 +2,7 @@ package com.project.reddit.service.search;
 
 import com.project.reddit.exception.BadRequestException;
 import com.project.reddit.exception.NotFoundException;
-import com.project.reddit.model.SearchTypes;
+import com.project.reddit.constants.UserProfileSearchType;
 import com.project.reddit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,12 +14,16 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Component
 @Slf4j
+/*
+* This is used for searching user content in his user profile
+* With this we can see what user posted or on what post he commented
+* */
 public class FilterUser<T> implements FilterUserContent<T>{
 
     private final UserRepository userRepository;
 
     @Override
-    public List<T> filterUserContent(Long userId, SearchTypes types) {
+    public List<T> filterUserContent(Long userId, UserProfileSearchType types) {
 
         var findUser = userRepository.findById(userId);
 
@@ -27,10 +31,10 @@ public class FilterUser<T> implements FilterUserContent<T>{
             throw new NotFoundException("User with ID " + userId + " was not found!");
         }
 
-        if (types.equals(SearchTypes.POST)) {
+        if (types.equals(UserProfileSearchType.POST)) {
             return (List<T>) findUser.get().getPosts().stream().collect(Collectors.toList());
 
-        } else if (types.equals(SearchTypes.COMMENTS)) {
+        } else if (types.equals(UserProfileSearchType.COMMENTS)) {
             return (List<T>) findUser.get().getComments().stream().collect(Collectors.toList());
 
         }else {
