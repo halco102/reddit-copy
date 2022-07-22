@@ -2,7 +2,6 @@ package com.project.reddit.model.likedislike;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.reddit.model.message.Comment;
-import com.project.reddit.model.message.EmbedableCommentLikeDislikeId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,7 +1,6 @@
 package com.project.reddit.model.likedislike;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.project.reddit.model.content.EmbedablePostLikeOrDislikeId;
 import com.project.reddit.model.content.Post;
 import com.project.reddit.model.user.User;
 import lombok.*;

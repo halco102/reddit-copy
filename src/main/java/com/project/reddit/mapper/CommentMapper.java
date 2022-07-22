@@ -1,13 +1,13 @@
 package com.project.reddit.mapper;
 
-import com.project.reddit.dto.comment.*;
+import com.project.reddit.dto.comment.CommentDto;
+import com.project.reddit.dto.comment.CommentRequest;
+import com.project.reddit.dto.comment.LikedOrDislikedCommentsDto;
+import com.project.reddit.model.likedislike.CommentLikeOrDislike;
 import com.project.reddit.model.message.Comment;
-import com.project.reddit.model.message.CommentLikeDislike;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
-
-import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface CommentMapper {
@@ -21,7 +21,7 @@ public interface CommentMapper {
     CommentDto toDto(Comment comment);
 
     @Mapping(source = "likeOrDislike", target = "likedOrDisliked")
-    LikedOrDislikedCommentsDto likedDislikedDto(CommentLikeDislike commentLikeDislike);
+    LikedOrDislikedCommentsDto likedDislikedDto(CommentLikeOrDislike commentLikeDislike);
 
     CommentDto requestToCommentDto(CommentRequest request);
 

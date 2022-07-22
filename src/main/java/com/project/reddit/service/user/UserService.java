@@ -313,7 +313,7 @@ public class UserService {
             return mapper;
 
         }else {
-            throw new Unauthorized("The password does not match");
+            throw new Unauthorized("Wrong email/username or password");
         }
 
     }
