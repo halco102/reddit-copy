@@ -24,6 +24,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = "select * from users inner join posts as p on p.users_id = users.id where users_id = :id", nativeQuery = true)
     Optional<User> getAllPostByUserId(@Param("id") Long id);
 
-    @Query(value = "Select * from users where name like %:name%", nativeQuery = true)
+    @Query(value = "Select * from users where username like :name%", nativeQuery = true)
     Set<User> searchPostsByName(@Param("name") String name);
 }
