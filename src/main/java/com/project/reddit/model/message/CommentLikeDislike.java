@@ -13,26 +13,26 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "likes_dislikes_comments")
-@Entity
+//@Table(name = "likes_dislikes_comments")
+//@Entity
 public class CommentLikeDislike {
 
-    @EmbeddedId
+    //@EmbeddedId
     private EmbedableCommentLikeDislikeId embedableCommentLikeDislikeId = new EmbedableCommentLikeDislikeId();
 
-    @ManyToOne
+/*    @ManyToOne
     @MapsId("userId")
     @JoinColumn(referencedColumnName = "id", name = "users_id")
-    @JsonIgnore
+    @JsonIgnore*/
     private User user;
 
-    @ManyToOne
+/*    @ManyToOne
     @MapsId("commentId")
     @JoinColumn(referencedColumnName = "id", name = "comments_id")
-    @JsonIgnore
+    @JsonIgnore*/
     private Comment comment;
 
-    @Column(name = "is_like")
+    //@Column(name = "is_like")
     private boolean likeOrDislike;
 
 

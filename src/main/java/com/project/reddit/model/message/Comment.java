@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.project.reddit.model.content.Post;
+import com.project.reddit.model.likedislike.CommentLikeOrDislike;
 import com.project.reddit.model.user.User;
 import lombok.*;
 
@@ -53,7 +54,7 @@ public class Comment {
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private List<CommentLikeDislike> likeDislikes = new ArrayList<>();
+    private List<CommentLikeOrDislike> likeDislikes = new ArrayList<>();
 
     public Comment(Long id, String text, LocalDate createdAt, Post post, User user, Long parentId) {
         this.id = id;

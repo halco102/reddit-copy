@@ -10,26 +10,26 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "post_likes_dislikes")
+//@Entity
+//@Table(name = "post_likes_dislikes")
 public class PostLikeOrDislike {
 
-    @EmbeddedId
+    //@EmbeddedId
     private EmbedablePostLikeOrDislikeId embedablePostLikeOrDislikeId = new EmbedablePostLikeOrDislikeId();
 
-    @MapsId("postId")
+/*    @MapsId("postId")
     @ManyToOne
     @JoinColumn(name = "posts_id", referencedColumnName = "id")
-    @JsonIgnore
+    @JsonIgnore*/
     private Post post;
 
-    @MapsId("userId")
+/*    @MapsId("userId")
     @ManyToOne
     @JoinColumn(name = "users_id", referencedColumnName = "id")
-    @JsonIgnore
+    @JsonIgnore*/
     private User user;
 
-    @Column(name = "is_like")
+    //@Column(name = "is_like")
     private boolean likeOrDislike;
 
 }

@@ -6,8 +6,8 @@ import com.project.reddit.dto.user.UserProfileDto;
 import com.project.reddit.dto.user.login.UserLoginResponse;
 import com.project.reddit.dto.user.signup.UserSignupRequestDto;
 import com.project.reddit.dto.user.signup.UserSignupResponseDto;
-import com.project.reddit.model.content.PostLikeOrDislike;
-import com.project.reddit.model.message.CommentLikeDislike;
+import com.project.reddit.model.likedislike.CommentLikeOrDislike;
+import com.project.reddit.model.likedislike.PostLikeOrDislike;
 import com.project.reddit.model.user.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -31,7 +31,7 @@ public interface UserMapper {
     @Mapping(target = "likeOrDislike", source = "likeOrDislike")
     @Mapping(target = "commentId", source = "comment.id")
     @Mapping(source = "comment.post.id", target = "postId")
-    LikedOrDislikedCommentsUser likeOrDislike(CommentLikeDislike commentLikeDislike);
+    LikedOrDislikedCommentsUser likeOrDislike(CommentLikeOrDislike commentLikeDislike);
 
     @Mapping(target = "postId", source = "post.id")
     @Mapping(target = "likeOrDislike", source = "likeOrDislike")

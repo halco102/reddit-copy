@@ -3,19 +3,17 @@ package com.project.reddit.service;
 import com.project.reddit.dto.comment.CommentDto;
 import com.project.reddit.dto.comment.CommentRequest;
 import com.project.reddit.dto.comment.EditCommentDto;
-import com.project.reddit.dto.comment.LikeOrDislikeCommentRequest;
+import com.project.reddit.dto.likeordislike.CommentLikeOrDislikeRequest;
 import com.project.reddit.exception.NotFoundException;
 import com.project.reddit.mapper.CommentMapper;
 import com.project.reddit.model.SearchTypes;
 import com.project.reddit.model.content.Post;
 import com.project.reddit.model.message.Comment;
-import com.project.reddit.model.message.CommentLikeDislike;
-import com.project.reddit.model.message.EmbedableCommentLikeDislikeId;
-import com.project.reddit.model.user.User;
 import com.project.reddit.repository.CommentRepository;
 import com.project.reddit.service.comment.DeleteComment;
+import com.project.reddit.service.likedislike.CommentLikeOrDislikeService;
+import com.project.reddit.service.likedislike.SimpleLikeOrDislikeFactory;
 import com.project.reddit.service.post.PostInterface;
-import com.project.reddit.service.post.PostService;
 import com.project.reddit.service.search.FilterUserContent;
 import com.project.reddit.service.sorting.SortingCommentsInterface;
 import com.project.reddit.service.user.UserService;
@@ -25,7 +23,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,6 +39,8 @@ public class CommentService implements DeleteComment {
     private final SortingCommentsInterface sortingCommentsInterface;
 
     private final FilterUserContent<Comment> filterUserContent;
+
+    private final SimpleLikeOrDislikeFactory factory;
 
 
     /*
@@ -108,74 +107,8 @@ public class CommentService implements DeleteComment {
         return getAllCommentsFromDb.stream().map(e -> this.commentMapper.toDto(e)).collect(Collectors.toList());
     }
 
-    /*
-    * This method is used for liking or disliking a comment, or if a user liked a comment
-    * if the user clicks like again the List should remove the liked comment.
-    * */
-    public CommentDto postLikeOrDislike(LikeOrDislikeCommentRequest request) {
-
-        // find the requested comment
-        var comment = this.commentRepository.findById(request.getCommentId());
-        var user = userService.getCurrentlyLoggedUser();
-
-        if (comment.isEmpty()) {
-            throw new NotFoundException("The comment wiht id " + request.getCommentId() + " does not exist!");
-        }
-
-        if (user == null) {
-            throw new NotFoundException("The user with id " + request.getUserId() + " does not exist");
-        }
-
-        // instantiate the object and set the values
-        CommentLikeDislike temp = new CommentLikeDislike();
-        temp.setEmbedableCommentLikeDislikeId(new EmbedableCommentLikeDislikeId(user.getId(), comment.get().getId()));
-        temp.setLikeOrDislike(request.isLikeOrDislike());
-        temp.setComment(comment.get());
-        temp.setUser(user);
-
-
-        if (!comment.get().getLikeDislikes().isEmpty()){
-            var findComment = checkIfUserLikedDislikedComment(comment.get(), user);
-
-            // if the list is empty just add the like or dislike to the list
-            if (findComment.isEmpty()) {
-                comment.get().getLikeDislikes().add(temp);
-            }else {
-
-                // if there is already an object remove it from list, this is used for if a user liked a comment and clicks like again
-                if (findComment.get().isLikeOrDislike() == request.isLikeOrDislike()) {
-                    comment.get().getLikeDislikes()
-                            .removeIf(item -> item.getEmbedableCommentLikeDislikeId().getCommentId().equals(findComment.get().getComment().getId())
-                                    && item.getEmbedableCommentLikeDislikeId().getUserId().equals(user.getId()));
-                }else {
-                    findComment.get().setLikeOrDislike(request.isLikeOrDislike());
-                }
-
-
-            }
-        }else {
-            comment.get().getLikeDislikes().add(temp);
-        }
-
-
-
-        var com = this.commentRepository.save(comment.get());
-
-        var commentDto = commentMapper.toDto(com);
-        return commentDto;
-    }
-
-
-    /*
-    * Helper method for like or dislike comments
-    * */
-    private Optional<CommentLikeDislike> checkIfUserLikedDislikedComment(Comment comment, User user) {
-        // find the comment object of liked or disliked comment
-        var findComment = comment.getLikeDislikes()
-                .stream()
-                .filter(item -> item.getEmbedableCommentLikeDislikeId().getCommentId().equals(comment.getId()) &&
-                        item.getEmbedableCommentLikeDislikeId().getUserId().equals(user.getId())).findAny();
-        return findComment;
+    public CommentDto postLikeOrDislike(CommentLikeOrDislikeRequest request) {
+       return (CommentDto) factory.getImplementation(CommentLikeOrDislikeService.class).likeOrDislike(request);
     }
 
     /*

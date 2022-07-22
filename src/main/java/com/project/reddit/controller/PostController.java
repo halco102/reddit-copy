@@ -2,6 +2,7 @@ package com.project.reddit.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.reddit.dto.likeordislike.LikeOrDislikeRequest;
 import com.project.reddit.dto.post.PostLikeOrDislikeRequest;
 import com.project.reddit.dto.post.PostRequestDto;
 import com.project.reddit.dto.post.UpdatePostDto;
@@ -57,7 +58,7 @@ public class PostController {
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
     @PostMapping("/like-dislike")
-    public ResponseEntity<?> postLikeOrDislike(@RequestBody PostLikeOrDislikeRequest request){
+    public ResponseEntity<?> postLikeOrDislike(@RequestBody LikeOrDislikeRequest request){
         return new ResponseEntity<>(this.postService.saveLikeOrDislikeForPost(request), HttpStatus.OK);
     }
 

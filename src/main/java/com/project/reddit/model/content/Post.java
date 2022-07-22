@@ -1,7 +1,7 @@
 package com.project.reddit.model.content;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.reddit.model.category.Category;
+import com.project.reddit.model.likedislike.PostLikeOrDislike;
 import com.project.reddit.model.message.Comment;
 import com.project.reddit.model.user.User;
 import lombok.AllArgsConstructor;
