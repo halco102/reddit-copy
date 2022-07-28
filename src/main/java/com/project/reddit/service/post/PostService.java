@@ -22,9 +22,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,7 +76,7 @@ public class PostService implements PostInterface, PostCategory{
 
         post.setAllowComments(requestDto.isAllowComments());
         post.setUser(user);
-        post.setCreatedAt(new Date(System.currentTimeMillis()));
+        post.setCreatedAt(LocalDateTime.now());
 
         var savedPost = this.postRepository.save(post);
         log.info("Post is saved " + savedPost);
@@ -229,7 +229,7 @@ public class PostService implements PostInterface, PostCategory{
 
         request.getCategories().forEach(cat -> findPost.getCategories().add(categoryMapper.toCategoryEntity(cat)));
 
-        findPost.setEditedAt(new Date(System.currentTimeMillis()));
+        findPost.setEditedAt(LocalDateTime.now());
 
         var savedPost = postRepository.save(findPost);
 

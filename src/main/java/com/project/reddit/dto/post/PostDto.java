@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -29,9 +29,9 @@ public class PostDto {
 
     private String imageUrl;
 
-    private Date editedAt;
+    private LocalDateTime editedAt;
 
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @NotNull
     @NotBlank
@@ -44,5 +44,7 @@ public class PostDto {
     private List<PostLikeOrDislikeDto> postLikeOrDislikeDtos = new ArrayList<>();
 
     private Set<CategoryDto> categories;
+
+
 
 }
