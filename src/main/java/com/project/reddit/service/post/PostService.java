@@ -1,22 +1,20 @@
 package com.project.reddit.service.post;
 
+import com.project.reddit.constants.UserProfileSearchType;
+import com.project.reddit.dto.likeordislike.LikeOrDislikeRequest;
 import com.project.reddit.dto.post.PostDto;
-import com.project.reddit.dto.post.PostLikeOrDislikeRequest;
 import com.project.reddit.dto.post.PostRequestDto;
 import com.project.reddit.dto.post.UpdatePostDto;
 import com.project.reddit.exception.BadRequestException;
 import com.project.reddit.exception.NotFoundException;
 import com.project.reddit.mapper.CategoryMapper;
 import com.project.reddit.mapper.PostMapper;
-import com.project.reddit.model.SearchTypes;
-import com.project.reddit.model.content.EmbedablePostLikeOrDislikeId;
 import com.project.reddit.model.content.Post;
-import com.project.reddit.model.content.PostLikeOrDislike;
-import com.project.reddit.model.user.User;
 import com.project.reddit.repository.PostRepository;
 import com.project.reddit.service.cloudinary.CloudinaryService;
+import com.project.reddit.service.likedislike.PostLikeOrDislikeService;
+import com.project.reddit.service.likedislike.SimpleLikeOrDislikeFactory;
 import com.project.reddit.service.search.FilterUserContent;
-import com.project.reddit.service.search.Search;
 import com.project.reddit.service.sorting.SortingCommentsInterface;
 import com.project.reddit.service.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -24,13 +22,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor()
-public class PostService implements PostInterface, PostLikeDislike, PostCategory{
+public class PostService implements PostInterface, PostCategory{
 
     private final PostRepository postRepository;
     private final PostMapper postMapper;
@@ -40,12 +41,11 @@ public class PostService implements PostInterface, PostLikeDislike, PostCategory
 
     private final SortingCommentsInterface sortingCommentsInterface;
 
-    private final Search<Post> postSearch;
-
     private final FilterUserContent<Post> filterUserContent;
 
-
     private final CategoryMapper categoryMapper;
+
+    private final SimpleLikeOrDislikeFactory factory;
 
 
 
@@ -160,55 +160,9 @@ public class PostService implements PostInterface, PostLikeDislike, PostCategory
         return listOfPosts.stream().map(e -> postMapper.toPostDto(e)).collect(Collectors.toList());
     }
 
-    public PostDto saveLikeOrDislikeForPost(PostLikeOrDislikeRequest request) {
-        var getPostById = this.postRepository.findById(request.getPostId());
-        var user = userService.getCurrentlyLoggedUser();
-
-        if (getPostById.isEmpty()) {
-            throw new NotFoundException("Post by id: " + request.getPostId() + " cannot be found");
-        }
-
-        PostLikeOrDislike postLikeOrDislike = new PostLikeOrDislike(new EmbedablePostLikeOrDislikeId(user.getId(), getPostById.get().getId()),
-                getPostById.get(), user, request.isLikeOrDislike());
-
-
-        if (!getPostById.get().getPostLikeOrDislikes().isEmpty()){
-            var findComment = checkIfUserLikedPost(getPostById.get(), user);
-
-            if (findComment.isEmpty()) {
-                getPostById.get().getPostLikeOrDislikes().add(postLikeOrDislike);
-            }else {
-                // if the request is same set likeDislike to null
-                if (findComment.get().isLikeOrDislike() == request.isLikeOrDislike()) {
-                    // same like request as in the db, remove it from list
-                    getPostById.get().getPostLikeOrDislikes()
-                            .removeIf(i -> i.getEmbedablePostLikeOrDislikeId().getPostId().equals(findComment.get().getEmbedablePostLikeOrDislikeId().getPostId())
-                            && i.getEmbedablePostLikeOrDislikeId().getUserId().equals(user.getId()));
-                }else {
-                    // there is no same request as in db add it to the list
-                    findComment.get().setLikeOrDislike(request.isLikeOrDislike());
-                }
-            }
-
-        }else {
-            // add if its empty
-            getPostById.get().getPostLikeOrDislikes().add(postLikeOrDislike);
-        }
-
-        var savePost = this.postRepository.save(getPostById.get());
-        return postMapper.toPostDto(savePost);
-    }
-
-    /*
-    * Helper method for save like or dislike on posts
-    * Checks if the user already liked or disliked the post
-    * */
-    private Optional<PostLikeOrDislike> checkIfUserLikedPost(Post post, User user) {
-        var findComment = post.getPostLikeOrDislikes()
-                .stream()
-                .filter(item -> item.getEmbedablePostLikeOrDislikeId().getPostId().equals(post.getId()) &&
-                        item.getEmbedablePostLikeOrDislikeId().getUserId().equals(user.getId())).findAny();
-        return findComment;
+    public PostDto saveLikeOrDislikeForPost(LikeOrDislikeRequest request) {
+        return (PostDto) factory.getImplementation(PostLikeOrDislikeService.class)
+                .likeOrDislike(request);
     }
 
     public void deleteAllPosts() {
@@ -242,13 +196,8 @@ public class PostService implements PostInterface, PostLikeDislike, PostCategory
         return sortByNumberOfDislikes.stream().map(e -> postMapper.toPostDto(e)).collect(Collectors.toList());
     }
 
-    public Set<PostDto> searchPostByName(String name) {
-        var search =  postSearch.search(name);
-        return search.stream().map(m -> postMapper.toPostDto(m)).collect(Collectors.toSet());
-    }
-
     public List<PostDto> filterPostsFromUserProfile(Long userId) {
-        return this.filterUserContent.filterUserContent(userId, SearchTypes.POST).stream().map(e -> postMapper.toPostDto(e)).collect(Collectors.toList());
+        return this.filterUserContent.filterUserContent(userId, UserProfileSearchType.POST).stream().map(e -> postMapper.toPostDto(e)).collect(Collectors.toList());
     }
 
     @Override

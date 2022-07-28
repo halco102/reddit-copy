@@ -2,6 +2,7 @@ package com.project.reddit.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.reddit.dto.likeordislike.LikeOrDislikeRequest;
 import com.project.reddit.dto.post.PostLikeOrDislikeRequest;
 import com.project.reddit.dto.post.PostRequestDto;
 import com.project.reddit.dto.post.UpdatePostDto;
@@ -23,11 +24,6 @@ public class PostController {
 
     private final PostService postService;
 
-    @DeleteMapping
-    public ResponseEntity<?> forTestingDeleteAllPosts() {
-        //this.postService.deleteAllPosts();
-        return new ResponseEntity<>( HttpStatus.OK);
-    }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
     @PostMapping(value = "", consumes = {  MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE }, produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -57,7 +53,7 @@ public class PostController {
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
     @PostMapping("/like-dislike")
-    public ResponseEntity<?> postLikeOrDislike(@RequestBody PostLikeOrDislikeRequest request){
+    public ResponseEntity<?> postLikeOrDislike(@RequestBody LikeOrDislikeRequest request){
         return new ResponseEntity<>(this.postService.saveLikeOrDislikeForPost(request), HttpStatus.OK);
     }
 
@@ -78,10 +74,7 @@ public class PostController {
         return new ResponseEntity<>(this.postService.sortPostByNumberOfDislikes(), HttpStatus.OK);
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<?> searchPostsByName(@RequestParam String name) {
-        return new ResponseEntity<>(this.postService.searchPostByName(name), HttpStatus.OK);
-    }
+
 
 /*    @GetMapping("/user/{id}")
     public ResponseEntity<?> filterUsersPosts(@PathVariable Long id) {

@@ -1,7 +1,7 @@
 package com.project.reddit.controller;
 
 import com.project.reddit.dto.comment.CommentRequest;
-import com.project.reddit.dto.comment.LikeOrDislikeCommentRequest;
+import com.project.reddit.dto.likeordislike.CommentLikeOrDislikeRequest;
 import com.project.reddit.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,7 +29,7 @@ public class CommentController {
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @PostMapping("/like-dislike")
-    public ResponseEntity<?> postLikeOrDislike(@RequestBody LikeOrDislikeCommentRequest request) {
+    public ResponseEntity<?> postLikeOrDislike(@RequestBody CommentLikeOrDislikeRequest request) {
         return new ResponseEntity<>(this.commentService.postLikeOrDislike(request), HttpStatus.OK);
     }
 

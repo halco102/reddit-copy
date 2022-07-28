@@ -16,7 +16,6 @@ public interface PostInterface {
     List<PostDto> getAllPosts();
     PostDto getPostDtoById(Long id);
     List<PostDto> getSimilarPostsByTitle(String title);
-    Set<PostDto> searchPostByName(String name);
 
     Post getPostEntityById(Long id);
 
