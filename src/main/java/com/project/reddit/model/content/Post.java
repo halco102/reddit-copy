@@ -1,7 +1,7 @@
 package com.project.reddit.model.content;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.reddit.model.category.Category;
+import com.project.reddit.model.likedislike.PostLikeOrDislike;
 import com.project.reddit.model.message.Comment;
 import com.project.reddit.model.user.User;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -40,10 +40,10 @@ public class Post {
     private boolean allowComments;
 
     @Column(name = "created_at")
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @Column(name = "edited_at")
-    private Date editedAt;
+    private LocalDateTime editedAt;
 
     @ManyToOne
     @JoinColumn(name = "users_id", referencedColumnName = "id")

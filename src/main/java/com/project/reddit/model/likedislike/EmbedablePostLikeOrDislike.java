@@ -1,4 +1,5 @@
-package com.project.reddit.model.content;
+package com.project.reddit.model.likedislike;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +13,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Embeddable
-public class EmbedablePostLikeOrDislikeId implements Serializable {
+public class EmbedablePostLikeOrDislike implements Serializable {
 
     @Column(name = "posts_id")
     private Long postId;

@@ -1,12 +1,13 @@
 package com.project.reddit.mapper;
 
-import com.project.reddit.dto.post.*;
+import com.project.reddit.dto.post.PostDto;
+import com.project.reddit.dto.post.PostForFrontPageDto;
+import com.project.reddit.dto.post.PostRequestDto;
+import com.project.reddit.dto.post.PostResponseDto;
 import com.project.reddit.model.content.Post;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
-
-import java.util.ArrayList;
 
 @Mapper(componentModel = "spring", uses = {CommentMapper.class, CategoryMapper.class})
 public interface PostMapper {

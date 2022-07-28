@@ -34,7 +34,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     /*
     * Search posts by title
     * */
-    @Query(value = "Select * from posts where title like :title%", nativeQuery = true)
+    @Query(value = "Select * from posts where title like :title% order by created_at desc", nativeQuery = true)
     Set<Post> searchPostsByName(@Param("title") String title);
 
     @Query(value = "SELECT p.*, c.* from post_categories inner join categories c on c.id = post_categories.categories_id inner join posts p on p.id = post_categories.posts_id where c.name = :categoryName", nativeQuery = true)

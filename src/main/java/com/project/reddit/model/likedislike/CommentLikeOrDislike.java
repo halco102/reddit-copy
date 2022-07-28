@@ -1,7 +1,7 @@
-package com.project.reddit.model.message;
+package com.project.reddit.model.likedislike;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.project.reddit.model.user.User;
+import com.project.reddit.model.message.Comment;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,25 +15,15 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Table(name = "likes_dislikes_comments")
 @Entity
-public class CommentLikeDislike {
+public class CommentLikeOrDislike extends LikeOrDislike{
 
     @EmbeddedId
-    private EmbedableCommentLikeDislikeId embedableCommentLikeDislikeId = new EmbedableCommentLikeDislikeId();
-
-    @ManyToOne
-    @MapsId("userId")
-    @JoinColumn(referencedColumnName = "id", name = "users_id")
-    @JsonIgnore
-    private User user;
+    private EmbedableCommentLikeOrDislike embedableCommentLikeDislikeId = new EmbedableCommentLikeOrDislike();
 
     @ManyToOne
     @MapsId("commentId")
     @JoinColumn(referencedColumnName = "id", name = "comments_id")
     @JsonIgnore
     private Comment comment;
-
-    @Column(name = "is_like")
-    private boolean likeOrDislike;
-
 
 }
