@@ -9,8 +9,8 @@ import com.project.reddit.exception.BadRequestException;
 import com.project.reddit.exception.DuplicateException;
 import com.project.reddit.exception.NotFoundException;
 import com.project.reddit.exception.Unauthorized;
-import com.project.reddit.mapper.CommentMapper;
-import com.project.reddit.mapper.UserMapper;
+import com.project.reddit.mapper.AbstractCommentMapper;
+import com.project.reddit.mapper.AbstractUserMapper;
 import com.project.reddit.model.content.Post;
 import com.project.reddit.model.user.User;
 import com.project.reddit.model.user.UserRole;
@@ -43,7 +43,7 @@ class UserServiceTest {
     UserRepository userRepository;
 
     @Mock
-    UserMapper userMapper;
+    AbstractUserMapper userMapper;
 
     @Mock
     AuthenticationManager authenticationManager;
@@ -61,7 +61,7 @@ class UserServiceTest {
     Search<User> search;
 
     @Mock
-    CommentMapper commentMapper;
+    AbstractCommentMapper commentMapper;
 
     @InjectMocks
     UserService userService;
