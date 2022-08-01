@@ -2,7 +2,7 @@ package com.project.reddit.service.category;
 
 import com.project.reddit.dto.category.CategoryDto;
 import com.project.reddit.dto.category.CategoryRequestDto;
-import com.project.reddit.mapper.CategoryMapper;
+import com.project.reddit.mapper.AbstractCategoryMapper;
 import com.project.reddit.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ public class CategoryService implements CategoryInterface{
 
     private final CategoryRepository categoryRepository;
 
-    private final CategoryMapper categoryMapper;
+    private final AbstractCategoryMapper categoryMapper;
 
     @Override
     public List<CategoryDto> getAllCategories() {
@@ -37,4 +37,5 @@ public class CategoryService implements CategoryInterface{
 
         return categoryMapper.toCategoryDto(savedObj);
     }
+
 }

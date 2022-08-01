@@ -7,8 +7,8 @@ import com.project.reddit.dto.post.PostRequestDto;
 import com.project.reddit.dto.post.UpdatePostDto;
 import com.project.reddit.exception.BadRequestException;
 import com.project.reddit.exception.NotFoundException;
-import com.project.reddit.mapper.CategoryMapper;
-import com.project.reddit.mapper.PostMapper;
+import com.project.reddit.mapper.AbstractCategoryMapper;
+import com.project.reddit.mapper.AbstractPostMapper;
 import com.project.reddit.model.content.Post;
 import com.project.reddit.repository.PostRepository;
 import com.project.reddit.service.cloudinary.CloudinaryService;
@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 public class PostService implements PostInterface, PostCategory{
 
     private final PostRepository postRepository;
-    private final PostMapper postMapper;
+    private final AbstractPostMapper postMapper;
 
     private final UserService userService;
     private final CloudinaryService cloudinaryService;
@@ -43,7 +43,7 @@ public class PostService implements PostInterface, PostCategory{
 
     private final FilterUserContent<Post> filterUserContent;
 
-    private final CategoryMapper categoryMapper;
+    private final AbstractCategoryMapper categoryMapper;
 
     private final SimpleLikeOrDislikeFactory factory;
 

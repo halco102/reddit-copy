@@ -1,12 +1,10 @@
 package com.project.reddit.service.search;
 
 import com.project.reddit.dto.user.UserProfileDto;
-import com.project.reddit.mapper.UserMapper;
-import com.project.reddit.model.user.User;
+import com.project.reddit.mapper.AbstractUserMapper;
 import com.project.reddit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -20,7 +18,7 @@ public class SearchUser implements Search<UserProfileDto> {
 
     private final UserRepository userRepository;
 
-    private final UserMapper userMapper;
+    private final AbstractUserMapper userMapper;
 
     @Override
     public Set<UserProfileDto> search(String name) {

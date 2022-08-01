@@ -3,7 +3,7 @@ package com.project.reddit.service.likedislike;
 import com.project.reddit.dto.comment.CommentDto;
 import com.project.reddit.dto.likeordislike.CommentLikeOrDislikeRequest;
 import com.project.reddit.exception.NotFoundException;
-import com.project.reddit.mapper.CommentMapper;
+import com.project.reddit.mapper.AbstractCommentMapper;
 import com.project.reddit.model.likedislike.CommentLikeOrDislike;
 import com.project.reddit.model.likedislike.EmbedableCommentLikeOrDislike;
 import com.project.reddit.model.message.Comment;
@@ -21,7 +21,7 @@ public class CommentLikeOrDislikeService implements ILikeOrDislike<CommentDto, C
 
     private final CommentRepository commentRepository;
 
-    private final CommentMapper commentMapper;
+    private final AbstractCommentMapper commentMapper;
 
     private final UserService userService;
 
