@@ -7,6 +7,7 @@ import com.project.reddit.dto.post.PostRequestDto;
 import com.project.reddit.dto.post.UpdatePostDto;
 import com.project.reddit.exception.BadRequestException;
 import com.project.reddit.exception.NotFoundException;
+import com.project.reddit.kafka.service.INotifications;
 import com.project.reddit.mapper.AbstractCategoryMapper;
 import com.project.reddit.mapper.AbstractPostMapper;
 import com.project.reddit.model.content.Post;
@@ -46,6 +47,8 @@ public class PostService implements PostInterface, PostCategory{
     private final AbstractCategoryMapper categoryMapper;
 
     private final SimpleLikeOrDislikeFactory factory;
+
+    private final INotifications notifications;
 
 
 
@@ -87,6 +90,9 @@ public class PostService implements PostInterface, PostCategory{
         postDto.setCommentsDto(new ArrayList<>());
         postDto.setPostLikeOrDislikeDtos(new ArrayList<>());
 
+
+        //send msg to followers
+        notifications.sendNotificationToFollowers(postDto, "post-notification");
 
         return postDto;
     }

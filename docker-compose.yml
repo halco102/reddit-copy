@@ -17,6 +17,7 @@ services:
   reddit:
     container_name: reddit_app
     build: .
+    image: redditregistry.azurecr.io/reddit
 
     ports:
       - 8082:8080
@@ -31,6 +32,9 @@ services:
       CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
       CLOUDINARY_SECRET_KEY: ${CLOUDINARY_SECRET_KEY}
       CLOUDINARY_NAME: ${CLOUDINARY_NAME}
+      GMAIL_USERNAME: ${GMAIL_USERNAME}
+      GMAIL_PASSWORD: ${GMAIL_PASSWORD}
+      SERVER_PORT: ${SERVER_PORT}
 
     depends_on:
       - db
@@ -40,12 +44,14 @@ services:
 
 
   nginx:
-    image: custom_nginx
+    build: nginx
+    image: redditregistry.azurecr.io/nginx
     container_name: custom_nginx
     depends_on:
       - reddit
     ports:
       - 80:80
+      - 81:80
 
 networks:
   default:

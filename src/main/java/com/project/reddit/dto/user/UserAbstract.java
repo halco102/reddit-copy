@@ -7,6 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
@@ -29,5 +30,14 @@ public abstract class UserAbstract {
 
     private String imageUrl;
 
-
+    @Override
+    public String toString() {
+        return "UserAbstract{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", createdAt=" + createdAt +
+                ", imageUrl='" + imageUrl + '\'' +
+                '}';
+    }
 }

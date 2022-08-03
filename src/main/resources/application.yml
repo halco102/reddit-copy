@@ -64,6 +64,14 @@ spring:
             enable: true
     protocol: smtp
 
+  kafka:
+    bootstrap-servers: 127.0.0.1:9092
+    consumer:
+      group-id: reddit-kafka
+    listener:
+      ack-mode: RECORD
+
+
 
 #  jpa:
 #    properties:
@@ -78,4 +86,7 @@ cloudinary-secret-key: ${CLOUDINARY_SECRET_KEY}
 cloudinary-name: ${CLOUDINARY_NAME}
 jwt-secret-key: ${JWT_SECRET_KEY}
 verify-email-url: ${VERIFY_EMAIL_URL}
+
+
+
 

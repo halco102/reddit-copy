@@ -2,6 +2,7 @@ package com.project.reddit.mapper;
 
 import com.project.reddit.dto.comment.LikedOrDislikedCommentsUser;
 import com.project.reddit.dto.post.PostLikeOrDislikeDto;
+import com.project.reddit.dto.user.UserInfo;
 import com.project.reddit.dto.user.UserProfileDto;
 import com.project.reddit.dto.user.follower.FollowDto;
 import com.project.reddit.dto.user.login.UserLoginResponse;
@@ -35,6 +36,8 @@ public abstract class AbstractUserMapper {
 
     })
     public abstract UserProfileDto userProfileDto(User user);
+
+    public abstract UserInfo userToUserInfo(User user);
 
     protected Set<FollowDto> followers(Set<Follows> user) {
         Set<FollowDto> followDtos = new HashSet<>();

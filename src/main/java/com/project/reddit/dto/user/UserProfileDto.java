@@ -8,12 +8,14 @@ import com.project.reddit.dto.user.follower.FollowDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
 @Data
+@ToString
 public class UserProfileDto extends UserAbstract{
 
     // what user posted
