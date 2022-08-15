@@ -195,6 +195,11 @@ public class UserService {
             userDto.setCommentsPosts(getAllCommentsWithPostId(user.get()));
         }
 
+        //cant map it
+        if (!user.get().getPosts().isEmpty()) {
+
+        }
+
         return userDto;
     }
 

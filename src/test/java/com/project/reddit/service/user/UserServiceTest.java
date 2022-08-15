@@ -1,3 +1,4 @@
+/*
 package com.project.reddit.service.user;
 
 import com.project.reddit.dto.post.PostForFrontPageDto;
@@ -94,6 +95,7 @@ class UserServiceTest {
         Assertions.assertThrows(DuplicateException.class, () -> userService.signupUser(userSignupRequestDto));
     }
 
+*/
 /*    @Test
     void testSignupUser() {
 
@@ -110,7 +112,8 @@ class UserServiceTest {
 
 
 
-    }*/
+    }*//*
+
 
     @Test
     void testVerifieUserViaEmail() {
@@ -221,4 +224,4 @@ class UserServiceTest {
         Assertions.assertEquals(userObject.getPosts().size(), userProfile.getPosts().size());
     }
 
-}
+}*/

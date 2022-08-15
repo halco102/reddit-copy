@@ -12,14 +12,13 @@ import com.project.reddit.model.likedislike.CommentLikeOrDislike;
 import com.project.reddit.model.likedislike.PostLikeOrDislike;
 import com.project.reddit.model.user.User;
 import com.project.reddit.model.user.follow.Follows;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
+import org.mapstruct.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring",injectionStrategy = InjectionStrategy.CONSTRUCTOR, uses = {AbstractPostMapper.class, AbstractPostMapper.class})
 public abstract class AbstractUserMapper {
 
     public abstract User signupToEntity (UserSignupRequestDto signupRequestDto);
@@ -29,11 +28,11 @@ public abstract class AbstractUserMapper {
     @Mapping(target = "jwt", source = "token")
     public abstract UserLoginResponse userLoginResponseDto(String token);
 
+
     @Mappings({
             @Mapping(target = "posts", source = "posts"),
             @Mapping(target = "followingDto", expression = "java(following(user.getFollowing()))"),
             @Mapping(target = "followersDto", expression = "java(followers(user.getFollowers()))")
-
     })
     public abstract UserProfileDto userProfileDto(User user);
 

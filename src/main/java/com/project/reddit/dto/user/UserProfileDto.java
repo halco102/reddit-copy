@@ -2,6 +2,7 @@ package com.project.reddit.dto.user;
 
 import com.project.reddit.dto.comment.LikedOrDislikedCommentsUser;
 import com.project.reddit.dto.comment.UserProfileCommentsWithPostId;
+import com.project.reddit.dto.post.PostDto;
 import com.project.reddit.dto.post.PostForFrontPageDto;
 import com.project.reddit.dto.post.PostLikeOrDislikeDto;
 import com.project.reddit.dto.user.follower.FollowDto;
@@ -19,6 +20,7 @@ import java.util.Set;
 public class UserProfileDto extends UserAbstract{
 
     // what user posted
+    //private List<PostForFrontPageDto> posts;
     private List<PostForFrontPageDto> posts;
 
     //private List<CommentDto> comments;

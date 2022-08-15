@@ -13,9 +13,9 @@ public class SendNotification implements INotifications {
     private final KafkaSender kafkaSender;
 
     @Override
-    public void sendNotificationToFollowers(PostDto postDto, String topic) {
+    public void sendNotificationToFollowers(Object object, String topic) {
 
-        if (postDto == null) {
+        if (object == null) {
             log.warn("REeeeee its null");
             return;
         }
@@ -23,6 +23,6 @@ public class SendNotification implements INotifications {
         // dovoljno je samo poslati na topic i svi da slusaju taj topic
         // znaci kada user posta nesto, salje na odredjeni topic i svi slusaju taj topic
         // trebaju samo znati od koga dolazi poruka, tj u ovom slucaju da znaju userInfo ko je postao i sta je postao da im dodje u notifikacijama
-        kafkaSender.sendMessageWithCallback(postDto, topic);
+        kafkaSender.sendMessageWithCallback(object, topic);
     }
 }

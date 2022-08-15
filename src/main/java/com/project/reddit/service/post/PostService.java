@@ -1,5 +1,6 @@
 package com.project.reddit.service.post;
 
+import com.project.reddit.constants.KafkaNotifications;
 import com.project.reddit.constants.UserProfileSearchType;
 import com.project.reddit.dto.likeordislike.LikeOrDislikeRequest;
 import com.project.reddit.dto.post.PostDto;
@@ -91,8 +92,12 @@ public class PostService implements PostInterface, PostCategory{
         postDto.setPostLikeOrDislikeDtos(new ArrayList<>());
 
 
-        //send msg to followers
-        notifications.sendNotificationToFollowers(postDto, "post-notification");
+        //send msg as notification
+        notifications.sendNotificationToFollowers(postDto, KafkaNotifications.NOTIFICATION_FOR_FOLLOWERS.name());
+
+        //send all posts to all subscribers on main page
+        notifications.sendNotificationToFollowers(getAllPosts(), KafkaNotifications.POST_NOTIFICATION.name());
+
 
         return postDto;
     }
