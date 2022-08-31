@@ -28,7 +28,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "    left outer join comments c on posts.id = c.posts_id" +
             "    left join users u on posts.users_id = u.id" +
             "    group by posts.id, c.id, u.id order by cnt desc", nativeQuery = true)
-    List<Post> sortPostByLikesOrDislikes(@Param("condition") boolean condition);
+    Set<Post> sortPostByLikesOrDislikes(@Param("condition") boolean condition);
 
 
     /*

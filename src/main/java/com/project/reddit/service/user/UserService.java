@@ -13,8 +13,8 @@ import com.project.reddit.dto.user.signup.UserSignupRequestDto;
 import com.project.reddit.dto.user.signup.UserSignupResponseDto;
 import com.project.reddit.exception.ClassCastException;
 import com.project.reddit.exception.*;
-import com.project.reddit.mapper.CommentMapper;
-import com.project.reddit.mapper.UserMapper;
+import com.project.reddit.mapper.AbstractCommentMapper;
+import com.project.reddit.mapper.AbstractUserMapper;
 import com.project.reddit.model.user.User;
 import com.project.reddit.model.user.UserRole;
 import com.project.reddit.repository.UserRepository;
@@ -50,7 +50,8 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
+
+    private final AbstractUserMapper userMapper;
 
     private final AuthenticationManager authenticationManager;
 
@@ -62,7 +63,7 @@ public class UserService {
 
     private final JavaMailSender mailSender;
 
-    private final CommentMapper commentMapper;
+    private final AbstractCommentMapper commentMapper;
 
     @Value("${MAIL_USERNAME}")
     private String email;
@@ -148,20 +149,6 @@ public class UserService {
             throw new NotFoundException("The user with id: " + id + " does not exist");
         }
 
-/*        var user = userMapper.userProfileDto(userById.get());
-
-        if (userById.get().getLikeDislikes() != null || userById.get().getLikeDislikes().isEmpty()) {
-            user.setLikedOrDislikedComments(getAllLikedOrDislikedCommentsByUser(userById.get()));
-        }
-
-        if (userById.get().getPostLikeOrDislikes() != null || userById.get().getPostLikeOrDislikes().isEmpty()) {
-            user.setPostLikeOrDislikeDtos(getAllPostLikeOrDislikeByUser(userById.get()));
-        }
-
-        if (userById.get().getComments() != null || userById.get().getComments().isEmpty()){
-            user.setCommentsPosts(getAllCommentsWithPostId(userById.get()));
-        }*/
-
         return castToUserProfile(userById);
     }
 
@@ -208,6 +195,11 @@ public class UserService {
             userDto.setCommentsPosts(getAllCommentsWithPostId(user.get()));
         }
 
+        //cant map it
+        if (!user.get().getPosts().isEmpty()) {
+
+        }
+
         return userDto;
     }
 
@@ -223,20 +215,6 @@ public class UserService {
         if (userByUsername.isEmpty()) {
             throw new NotFoundException("The user with username: " + username + " does not exist!");
         }
-
-/*        var user = userMapper.userProfileDto(userByUsername.get());
-
-        if (userByUsername.get().getLikeDislikes() != null || userByUsername.get().getLikeDislikes().isEmpty()) {
-            user.setLikedOrDislikedComments(getAllLikedOrDislikedCommentsByUser(userByUsername.get()));
-        }
-
-        if (userByUsername.get().getPostLikeOrDislikes() != null || userByUsername.get().getPostLikeOrDislikes().isEmpty()) {
-            user.setPostLikeOrDislikeDtos(getAllPostLikeOrDislikeByUser(userByUsername.get()));
-        }
-
-        if (userByUsername.get().getComments() != null || userByUsername.get().getComments().isEmpty()){
-            user.setCommentsPosts(getAllCommentsWithPostId(userByUsername.get()));
-        }*/
 
         return castToUserProfile(userByUsername);
     }
