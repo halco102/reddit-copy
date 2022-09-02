@@ -11,7 +11,7 @@ import org.mapstruct.Mappings;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {AbstractCommentMapper.class})
 @RequiredArgsConstructor
 public abstract class AbstractPostMapper {
 
