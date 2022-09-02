@@ -18,8 +18,12 @@ public abstract class AbstractCommentMapper {
 
     @Mappings({
             @Mapping(source = "comment.user", target = "userInfo"),
-            @Mapping(source = "comment.likeDislikes", target = "likedOrDislikedComments")
+            @Mapping(source = "likeDislikes", target = "likedOrDislikedComments")
     })
     public abstract CommentDto toDto(Comment comment);
+
+
+    @Mapping(target = "likedOrDisliked", source = "likeOrDislike")
+    public abstract LikedOrDislikedCommentsDto likeModelToEntity(CommentLikeOrDislike ld);
 
 }

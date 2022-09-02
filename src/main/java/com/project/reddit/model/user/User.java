@@ -24,7 +24,6 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-@ToString
 public class User {
 
     @Id
@@ -104,5 +103,6 @@ public class User {
         this.password = password;
         this.email = email;
     }
+
 
 }
