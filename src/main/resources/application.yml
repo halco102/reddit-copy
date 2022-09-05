@@ -13,7 +13,7 @@ spring:
 
 
   kafka:
-    bootstrap-servers: 127.0.0.1:9092
+    bootstrap-servers: ${BOOTSTRAP_SERVER}
     consumer:
       group-id: halco
     listener:
