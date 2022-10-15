@@ -8,7 +8,7 @@ import com.project.reddit.dto.post.PostRequestDto;
 import com.project.reddit.dto.post.UpdatePostDto;
 import com.project.reddit.exception.BadRequestException;
 import com.project.reddit.exception.NotFoundException;
-import com.project.reddit.kafka.service.INotifications;
+import com.project.reddit.kafka.service.generic.NotificationContext;
 import com.project.reddit.mapper.AbstractCategoryMapper;
 import com.project.reddit.mapper.AbstractPostMapper;
 import com.project.reddit.model.content.Post;
@@ -49,7 +49,9 @@ public class PostService implements PostInterface, PostCategory{
 
     private final SimpleLikeOrDislikeFactory factory;
 
-    private final INotifications notifications;
+
+    private final NotificationContext notificationContext;
+
 
 
 
@@ -87,16 +89,16 @@ public class PostService implements PostInterface, PostCategory{
 
         var postDto = postMapper.toPostDto(savedPost);
 
+
         //workaround
         postDto.setCommentsDto(new ArrayList<>());
         postDto.setPostLikeOrDislikeDtos(new ArrayList<>());
 
 
-        //send msg as notification
-        notifications.sendNotificationToFollowers(postDto, KafkaNotifications.NOTIFICATION_FOR_FOLLOWERS.name());
-
-        //send all posts to all subscribers on main page
-        notifications.sendNotificationToFollowers(getAllPosts(), KafkaNotifications.POST_NOTIFICATION.name());
+        //send notification to POST ws
+        notificationContext.sendMessageToKafka(KafkaNotifications.POST_NOTIFICATION, postDto, KafkaNotifications.POST_NOTIFICATION.name());
+        //send notification to followers
+        notificationContext.sendMessageToKafka(KafkaNotifications.FOLLOWER_NOTIFICATION, postDto, KafkaNotifications.FOLLOWER_NOTIFICATION.name());
 
 
         return postDto;
