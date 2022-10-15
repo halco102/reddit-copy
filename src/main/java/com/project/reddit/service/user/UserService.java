@@ -9,6 +9,7 @@ import com.project.reddit.dto.post.PostLikeOrDislikeDto;
 import com.project.reddit.dto.user.UserProfileDto;
 import com.project.reddit.dto.user.login.UserLoginRequestDto;
 import com.project.reddit.dto.user.login.UserLoginResponse;
+import com.project.reddit.dto.user.notification.UserNotification;
 import com.project.reddit.dto.user.signup.UserSignupRequestDto;
 import com.project.reddit.dto.user.signup.UserSignupResponseDto;
 import com.project.reddit.exception.ClassCastException;
@@ -36,10 +37,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -332,4 +330,11 @@ public class UserService {
     }
 
 
+    public Set<UserNotification> getAllNotifications(){
+        var currentUser = getCurrentlyLoggedUser();
+
+        return currentUser.getNotifications()
+                .stream()
+                .map(m -> userMapper.userNotification(m)).collect(Collectors.toSet());
+    }
 }
