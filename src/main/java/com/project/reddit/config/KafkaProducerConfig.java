@@ -27,18 +27,19 @@ public class KafkaProducerConfig {
                 bootstrapServers);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        //props.put(JsonSerializer.TYPE_MAPPINGS, "Post:com.project.reddit.dto.post.PostDto");
         props.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, "20971520");
 
         return props;
     }
 
     @Bean
-    public ProducerFactory<Object, String> producerFactory() {
+    public ProducerFactory<String, Object> producerFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfigs());
     }
 
     @Bean
-    public KafkaTemplate<Object, String> kafkaTemplate() {
+    public KafkaTemplate<String, Object> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 
