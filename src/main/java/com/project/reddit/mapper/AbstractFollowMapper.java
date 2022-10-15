@@ -17,4 +17,7 @@ public abstract class AbstractFollowMapper {
     @Mapping(target = "FollowDto", source = "")
     public abstract Set<FollowDto> toFollowers(Set<Follows> followers);
 
+    public abstract FollowDto fromUserToFollowDto(User user);
+
+    public abstract Set<Follows> fromDtoToEntity(Set<FollowDto> followDtos);
 }

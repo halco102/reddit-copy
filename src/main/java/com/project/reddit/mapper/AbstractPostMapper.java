@@ -2,16 +2,21 @@ package com.project.reddit.mapper;
 
 import com.project.reddit.dto.post.PostDto;
 import com.project.reddit.dto.post.PostForFrontPageDto;
+import com.project.reddit.dto.post.PostNotificationDto;
 import com.project.reddit.dto.post.PostRequestDto;
+import com.project.reddit.dto.user.notification.UserNotification;
 import com.project.reddit.model.content.Post;
 import lombok.RequiredArgsConstructor;
+import org.mapstruct.CollectionMappingStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
-@Mapper(componentModel = "spring", uses = {AbstractCommentMapper.class})
+@Mapper(componentModel = "spring", uses = {AbstractCommentMapper.class}, collectionMappingStrategy = CollectionMappingStrategy.ADDER_PREFERRED)
 @RequiredArgsConstructor
 public abstract class AbstractPostMapper {
 
@@ -28,4 +33,8 @@ public abstract class AbstractPostMapper {
     @Mapping(source = "post.postLikeOrDislikes", target = "postLikeOrDislikeDtos")
     public abstract PostForFrontPageDto toFrontPageDto(Post post);
 
+    public abstract Post postDtoToEntity(PostDto postDto);
+
+
+    public abstract PostNotificationDto notifications(Post post);
 }

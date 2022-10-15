@@ -6,8 +6,10 @@ import com.project.reddit.dto.user.UserInfo;
 import com.project.reddit.dto.user.UserProfileDto;
 import com.project.reddit.dto.user.follower.FollowDto;
 import com.project.reddit.dto.user.login.UserLoginResponse;
+import com.project.reddit.dto.user.notification.UserNotification;
 import com.project.reddit.dto.user.signup.UserSignupRequestDto;
 import com.project.reddit.dto.user.signup.UserSignupResponseDto;
+import com.project.reddit.model.content.Post;
 import com.project.reddit.model.likedislike.CommentLikeOrDislike;
 import com.project.reddit.model.likedislike.PostLikeOrDislike;
 import com.project.reddit.model.user.User;
@@ -18,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.HashSet;
 import java.util.Set;
 
-@Mapper(componentModel = "spring",injectionStrategy = InjectionStrategy.CONSTRUCTOR, uses = {AbstractPostMapper.class, AbstractPostMapper.class})
+@Mapper(componentModel = "spring",injectionStrategy = InjectionStrategy.CONSTRUCTOR, uses = {AbstractPostMapper.class})
 public abstract class AbstractUserMapper {
 
     public abstract User signupToEntity (UserSignupRequestDto signupRequestDto);
@@ -80,5 +82,11 @@ public abstract class AbstractUserMapper {
     @Mapping(target = "likeOrDislike", source = "likeOrDislike")
     public abstract PostLikeOrDislikeDto postLikeOrDislike(PostLikeOrDislike postLikeOrDislike);
 
+
+    @Mappings({
+            @Mapping(target = "notifications", source = "post"),
+            @Mapping(target = "userInfo", source = "post.user")
+    })
+    public abstract UserNotification userNotification(Post post);
 
 }
