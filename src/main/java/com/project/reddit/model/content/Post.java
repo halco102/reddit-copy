@@ -1,5 +1,6 @@
 package com.project.reddit.model.content;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.reddit.model.category.Category;
 import com.project.reddit.model.likedislike.PostLikeOrDislike;
 import com.project.reddit.model.message.Comment;
@@ -62,6 +63,11 @@ public class Post {
             joinColumns = @JoinColumn(name = "posts_id"), inverseJoinColumns = @JoinColumn(name = "categories_id")
     )
     private Set<Category> categories;
+
+    @ManyToMany(mappedBy = "notifications")
+    @JsonIgnore
+    private Set<User> notifications;
+
 
     public Post(Long id, String title, String text, String imageUrl, boolean allowComments, User user) {
         this.id = id;
