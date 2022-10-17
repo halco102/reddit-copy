@@ -89,6 +89,12 @@ public class MessageBrokerController<T>{
     @KafkaListener(topics = "COMMENT_NOTIFICATION", containerFactory = "kafkaListenerContainerFactory")
     public void afterCommentIsUploaded(@Payload PostCommentNotificationModel postCommentNotificationModel, Acknowledgment acknowledgment) {
         messagingTemplate.convertAndSend("/topic/comment/" + postCommentNotificationModel.getPostId(), postCommentNotificationModel.getCommentDto());
+        acknowledgment.acknowledge();
+    }
+
+    @KafkaListener(topics = "DELETE_COMMENT_NOTIFICATION", containerFactory = "kafkaListenerContainerFactory")
+    public void sendMsgAfterCommentIsDeleted(@Payload Long postId){
+        messagingTemplate.convertAndSend("/topic/comment/" + postId, "COMMENT_DELETED");
     }
 
 

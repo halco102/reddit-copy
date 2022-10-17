@@ -157,6 +157,8 @@ public class CommentService implements DeleteComment {
 
         comments.forEach(item -> this.commentRepository.delete(item));
 
+        //send to subscribed users
+        notificationContext.sendMessageToKafka(KafkaNotifications.DELETE_COMMENT_NOTIFICATION, comments.get(0).getPost().getId(), KafkaNotifications.DELETE_COMMENT_NOTIFICATION.name());
     }
 
 

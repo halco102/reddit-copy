@@ -6,13 +6,13 @@ import com.project.reddit.kafka.service.generic.GenericKafkaSender;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DeleteCommentNotification extends AbstractSendNotification<CommentDto> {
-    public DeleteCommentNotification(GenericKafkaSender<CommentDto> genericKafkaSender) {
+public class DeleteCommentNotification extends AbstractSendNotification<Long> {
+    public DeleteCommentNotification(GenericKafkaSender<Long> genericKafkaSender) {
         super(genericKafkaSender);
     }
 
     @Override
-    public void sendNotification(CommentDto object, String topic) {
+    public void sendNotification(Long object, String topic) {
         super.sendNotification(object, topic);
     }
 }
