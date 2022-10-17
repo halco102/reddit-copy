@@ -2,6 +2,8 @@ package com.project.reddit.kafka.service.generic;
 
 import com.project.reddit.constants.KafkaNotifications;
 import com.project.reddit.exception.NotFoundException;
+import com.project.reddit.kafka.service.generic.notifications.CommentPostedNotification;
+import com.project.reddit.kafka.service.generic.notifications.DeleteCommentNotification;
 import com.project.reddit.kafka.service.generic.notifications.FollowerNotification;
 import com.project.reddit.kafka.service.generic.notifications.PostNotification;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,10 @@ public class NotificationContext {
                 map.put(KafkaNotifications.FOLLOWER_NOTIFICATION, notification);
             }else if (notification instanceof PostNotification){
                 map.put(KafkaNotifications.POST_NOTIFICATION, notification);
+            }else if (notification instanceof DeleteCommentNotification) {
+                map.put(KafkaNotifications.DELETE_COMMENT_NOTIFICATION, notification);
+            }else if (notification instanceof CommentPostedNotification) {
+                map.put(KafkaNotifications.COMMENT_NOTIFICATION, notification);
             }else {
                 throw new NotFoundException("Error");
             }
