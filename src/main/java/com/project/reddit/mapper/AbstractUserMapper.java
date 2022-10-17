@@ -1,6 +1,7 @@
 package com.project.reddit.mapper;
 
 import com.project.reddit.dto.comment.LikedOrDislikedCommentsUser;
+import com.project.reddit.dto.post.PostDto;
 import com.project.reddit.dto.post.PostLikeOrDislikeDto;
 import com.project.reddit.dto.user.UserInfo;
 import com.project.reddit.dto.user.UserProfileDto;
@@ -88,5 +89,11 @@ public abstract class AbstractUserMapper {
             @Mapping(target = "userInfo", source = "post.user")
     })
     public abstract UserNotification userNotification(Post post);
+
+    @Mappings({
+            @Mapping(target = "notifications", source = "post"),
+            @Mapping(target = "userInfo", source = "post.postedBy")
+    })
+    public abstract UserNotification userNotification2(PostDto post);
 
 }
