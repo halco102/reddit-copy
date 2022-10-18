@@ -4,13 +4,16 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
 import com.project.reddit.dto.comment.CommentDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.comparator.Comparators;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class SortingComments implements SortingCommentsInterface {
 
     /*
@@ -27,6 +30,7 @@ public class SortingComments implements SortingCommentsInterface {
             multimap.putAll(rest);
         }
 
+        multimap.keys().stream().sorted(Comparator.reverseOrder());
         // change it back to list
         return multimap.values().stream().collect(Collectors.toList());
     }
@@ -38,13 +42,15 @@ public class SortingComments implements SortingCommentsInterface {
      * Takes the initial list and finds all comments that are base comments
      * and first elements that are pointing to base comment,
      * after its found it is deleted from list
+     *
      * */
     private ListMultimap<Long, CommentDto> addBaseCommentAndFirstChildrenToMap(List<CommentDto> commentDtos) {
-        ListMultimap<Long, CommentDto> multimap = MultimapBuilder.treeKeys().arrayListValues().build();
+        ListMultimap<Long, CommentDto> multimap = MultimapBuilder.treeKeys(Comparators.comparable().reversed()).arrayListValues().build();
 
         commentDtos.removeIf(e -> {
             if (e.getParentId() == null) {
                 multimap.put(e.getId(), e);
+
                 return true;
             }
 

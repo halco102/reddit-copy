@@ -1,13 +1,10 @@
 package com.project.reddit.service.search;
 
 import com.project.reddit.dto.post.PostDto;
-import com.project.reddit.mapper.PostMapper;
-import com.project.reddit.model.content.Post;
-import com.project.reddit.model.user.User;
+import com.project.reddit.mapper.AbstractPostMapper;
 import com.project.reddit.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -21,7 +18,7 @@ public class SearchPost implements Search<PostDto> {
 
     private final PostRepository postRepository;
 
-    private final PostMapper postMapper;
+    private final AbstractPostMapper postMapper;
 
     @Override
     public Set<PostDto> search(String name) {

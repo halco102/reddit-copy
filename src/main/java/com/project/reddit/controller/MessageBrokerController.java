@@ -1,41 +1,106 @@
 package com.project.reddit.controller;
 
-import com.project.reddit.dto.comment.CommentDto;
+import com.google.gson.Gson;
 import com.project.reddit.dto.post.PostDto;
-import com.project.reddit.dto.user.UserProfileDto;
+import com.project.reddit.exception.NotFoundException;
+import com.project.reddit.kafka.service.generic.model.PostCommentNotificationModel;
+import com.project.reddit.mapper.AbstractPostMapper;
+import com.project.reddit.mapper.AbstractUserMapper;
+import com.project.reddit.repository.UserRepository;
 import com.project.reddit.service.CommentService;
-import com.project.reddit.service.post.PostService;
-import com.project.reddit.service.sorting.SortingCommentsInterface;
-import com.project.reddit.service.user.UserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.Acknowledgment;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
-import javax.transaction.Transactional;
 import java.util.List;
 
 @Controller
 @Slf4j
-public class MessageBrokerController {
+@RequiredArgsConstructor
+public class MessageBrokerController<T>{
 
-    @Autowired
-    PostService postService;
 
-    @Autowired
-    UserService userService;
+    private final UserRepository userRepository;
 
-    @Autowired
-    SortingCommentsInterface sortingCommentsInterface;
+    private final CommentService commentService;
 
-    @Autowired
-    CommentService commentService;
+    private final SimpMessagingTemplate messagingTemplate;
 
-    @Autowired
-    SimpMessagingTemplate messagingTemplate;
+    private final AbstractPostMapper postMapper;
 
+    private final AbstractUserMapper userMapper;
+
+
+
+    private T fromJsonToObject(String json, Class<?> toClass) {
+        Gson gson = new Gson();
+
+        if (toClass == List.class) {
+            log.info("ListClass");
+            //return gson.toJson(json);
+            return (T) gson.toJson(json);
+        }
+
+        return (T) gson.fromJson(json, toClass);
+        //return gson.fromJson(json, toClass);
+    }
+
+
+    //TODO
+    /*
+    * Change everything to kafka later
+    * */
+
+    /*
+    * This method is used for sending PostDto object to all followers of one user
+    * */
+    @KafkaListener(topics = "FOLLOWER_NOTIFICATION", containerFactory="kafkaListenerContainerFactory")
+    public void sendNotificationAfterPostIsSaved(@Payload PostDto postDto, Acknowledgment acknowledgment){
+
+        var findUser = userRepository.findById(postDto.getPostedBy().getId()).orElseThrow(() -> new NotFoundException("User was not found"));
+
+        //send notification to followers
+        findUser.getFollowers().forEach(user -> {
+            userMapper.userNotification2(postDto);
+            messagingTemplate.convertAndSendToUser(user.getFrom().getUsername(), "/queue/notification", userMapper.userNotification2(postDto));
+            //save users not
+            user.getFrom().getNotifications().add(postMapper.postDtoToEntity(postDto));
+            userRepository.save(user.getFrom());
+        });
+
+        acknowledgment.acknowledge();
+    }
+
+    @KafkaListener(topics = "POST_NOTIFICATION", containerFactory="kafkaListenerContainerFactory")
+    public void afterPostIsSavedReturnListOfPostDtos(@Payload PostDto postDto ,Acknowledgment acknowledgment) {
+        messagingTemplate.convertAndSend("/topic/post", postDto);
+        acknowledgment.acknowledge();
+    }
+
+    @KafkaListener(topics = "USER_PROFILE_NOTIFICATION", containerFactory = "kafkaListenerContainerFactory")
+    public void afterUserDeletesOrUpdatesPost(@Payload String body, Acknowledgment acknowledgment) {
+       // messagingTemplate.convertAndSend("/topic/user", );
+    }
+
+    @KafkaListener(topics = "COMMENT_NOTIFICATION", containerFactory = "kafkaListenerContainerFactory")
+    public void afterCommentIsUploaded(@Payload PostCommentNotificationModel postCommentNotificationModel, Acknowledgment acknowledgment) {
+        messagingTemplate.convertAndSend("/topic/comment/" + postCommentNotificationModel.getPostId(), postCommentNotificationModel.getCommentDto());
+        acknowledgment.acknowledge();
+    }
+
+    @KafkaListener(topics = "DELETE_COMMENT_NOTIFICATION", containerFactory = "kafkaListenerContainerFactory")
+    public void sendMsgAfterCommentIsDeleted(@Payload Long postId){
+        messagingTemplate.convertAndSend("/topic/comment/" + postId, "COMMENT_DELETED");
+    }
+
+
+
+
+/*
     @MessageMapping("/post")
     @SendTo("/topic/post")
     @Transactional
@@ -85,6 +150,6 @@ public class MessageBrokerController {
         //simpMessagingTemplate.convertAndSendToUser(principal.getName(), "/topic/user", this.userService.getUserProfileByUsernameOrId(null, id));
         messagingTemplate.convertAndSend("/topic/post", postService.getAllPosts());
         return this.userService.getUserProfileByUsernameOrId(null, userProfileDto.getId());
-    }
+    }*/
 
 }

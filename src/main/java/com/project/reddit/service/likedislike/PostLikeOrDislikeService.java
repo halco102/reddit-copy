@@ -3,7 +3,7 @@ package com.project.reddit.service.likedislike;
 import com.project.reddit.dto.likeordislike.LikeOrDislikeRequest;
 import com.project.reddit.dto.post.PostDto;
 import com.project.reddit.exception.NotFoundException;
-import com.project.reddit.mapper.PostMapper;
+import com.project.reddit.mapper.AbstractPostMapper;
 import com.project.reddit.model.content.Post;
 import com.project.reddit.model.likedislike.EmbedablePostLikeOrDislike;
 import com.project.reddit.model.likedislike.PostLikeOrDislike;
@@ -23,7 +23,7 @@ public class PostLikeOrDislikeService implements ILikeOrDislike<PostDto, LikeOrD
 
     private final UserService userService;
 
-    private final PostMapper postMapper;
+    private final AbstractPostMapper postMapper;
 
     @Override
     public PostDto likeOrDislike(LikeOrDislikeRequest request) {

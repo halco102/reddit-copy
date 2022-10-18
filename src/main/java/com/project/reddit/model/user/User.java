@@ -9,14 +9,14 @@ import com.project.reddit.model.content.Post;
 import com.project.reddit.model.likedislike.CommentLikeOrDislike;
 import com.project.reddit.model.likedislike.PostLikeOrDislike;
 import com.project.reddit.model.message.Comment;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.project.reddit.model.user.follow.Follows;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -24,6 +24,7 @@ import java.util.List;
 @Table(name = "users")
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 public class User {
 
     @Id
@@ -71,6 +72,17 @@ public class User {
     @Column(name = "verified")
     private boolean verified;
 
+    @OneToMany(mappedBy = "from", fetch = FetchType.EAGER)
+    private Set<Follows> following;
+
+    @OneToMany(mappedBy = "to", fetch = FetchType.EAGER)
+    private Set<Follows> followers;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_notifications", joinColumns = @JoinColumn(name = "users_id"), inverseJoinColumns = @JoinColumn(name = "posts_id"))
+    private Set<Post> notifications = new HashSet<>();
+
+
 
     public User(Long id, String username, String password, String email, LocalDate createdAt, String imageUrl, UserRole role) {
         this.id = id;
@@ -87,4 +99,6 @@ public class User {
         this.password = password;
         this.email = email;
     }
+
+
 }

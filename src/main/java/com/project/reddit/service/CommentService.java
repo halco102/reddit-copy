@@ -1,12 +1,15 @@
 package com.project.reddit.service;
 
+import com.project.reddit.constants.KafkaNotifications;
+import com.project.reddit.constants.UserProfileSearchType;
 import com.project.reddit.dto.comment.CommentDto;
 import com.project.reddit.dto.comment.CommentRequest;
 import com.project.reddit.dto.comment.EditCommentDto;
 import com.project.reddit.dto.likeordislike.CommentLikeOrDislikeRequest;
 import com.project.reddit.exception.NotFoundException;
-import com.project.reddit.mapper.CommentMapper;
-import com.project.reddit.constants.UserProfileSearchType;
+import com.project.reddit.kafka.service.generic.NotificationContext;
+import com.project.reddit.kafka.service.generic.model.PostCommentNotificationModel;
+import com.project.reddit.mapper.AbstractCommentMapper;
 import com.project.reddit.model.content.Post;
 import com.project.reddit.model.message.Comment;
 import com.project.reddit.repository.CommentRepository;
@@ -31,7 +34,7 @@ import java.util.stream.Collectors;
 public class CommentService implements DeleteComment {
 
     private final CommentRepository commentRepository;
-    private final CommentMapper commentMapper;
+    private final AbstractCommentMapper commentMapper;
     private final UserService userService;
 
     private final PostInterface postInterface;
@@ -41,6 +44,8 @@ public class CommentService implements DeleteComment {
     private final FilterUserContent<Comment> filterUserContent;
 
     private final SimpleLikeOrDislikeFactory factory;
+
+    private final NotificationContext notificationContext;
 
 
     /*
@@ -75,6 +80,11 @@ public class CommentService implements DeleteComment {
 
 
         var saveComment = this.commentRepository.save(comment);
+
+        notificationContext.sendMessageToKafka(KafkaNotifications.COMMENT_NOTIFICATION, new PostCommentNotificationModel(
+                commentMapper.toDto(comment),
+                request.getPostId()
+        ), KafkaNotifications.COMMENT_NOTIFICATION.name());
 
         return this.commentMapper.toDto(saveComment);
     }
@@ -147,6 +157,8 @@ public class CommentService implements DeleteComment {
 
         comments.forEach(item -> this.commentRepository.delete(item));
 
+        //send to subscribed users
+        notificationContext.sendMessageToKafka(KafkaNotifications.DELETE_COMMENT_NOTIFICATION, comments.get(0).getPost().getId(), KafkaNotifications.DELETE_COMMENT_NOTIFICATION.name());
     }
 
 

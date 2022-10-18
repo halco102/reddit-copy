@@ -1,8 +1,8 @@
 package com.project.reddit.service.search;
 
+import com.project.reddit.constants.UserProfileSearchType;
 import com.project.reddit.exception.BadRequestException;
 import com.project.reddit.exception.NotFoundException;
-import com.project.reddit.constants.UserProfileSearchType;
 import com.project.reddit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

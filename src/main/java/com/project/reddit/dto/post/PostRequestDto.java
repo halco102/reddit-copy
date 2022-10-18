@@ -18,6 +18,7 @@ public class PostRequestDto {
     @NotNull
     private String title;
 
+    @NotNull
     private String text;
 
     @NotBlank

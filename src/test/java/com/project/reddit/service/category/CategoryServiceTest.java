@@ -2,11 +2,9 @@ package com.project.reddit.service.category;
 
 import com.project.reddit.dto.category.CategoryDto;
 import com.project.reddit.dto.category.CategoryRequestDto;
-import com.project.reddit.mapper.CategoryMapper;
-import com.project.reddit.mapper.CategoryMapperImpl;
+import com.project.reddit.mapper.AbstractCategoryMapper;
 import com.project.reddit.model.category.Category;
 import com.project.reddit.repository.CategoryRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +16,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -28,7 +27,7 @@ class CategoryServiceTest {
     CategoryRepository categoryRepository;
 
     @Mock
-    CategoryMapper categoryMapper;
+    AbstractCategoryMapper categoryMapper;
 
     @InjectMocks
     CategoryService categoryService;

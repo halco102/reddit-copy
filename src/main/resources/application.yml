@@ -10,6 +10,19 @@ spring:
     multipart:
       max-file-size: 25MB
       max-request-size: 25MB
+
+
+  kafka:
+    bootstrap-servers: ${BOOTSTRAP_SERVER}
+    consumer:
+      group-id: halco
+    listener:
+      ack-mode: RECORD
+#    producer:
+#      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+#      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+
   h2:
     console:
       enabled: false
@@ -65,6 +78,9 @@ spring:
     protocol: smtp
 
 
+
+
+
 #  jpa:
 #    properties:
 #      hibernate:
@@ -78,4 +94,7 @@ cloudinary-secret-key: ${CLOUDINARY_SECRET_KEY}
 cloudinary-name: ${CLOUDINARY_NAME}
 jwt-secret-key: ${JWT_SECRET_KEY}
 verify-email-url: ${VERIFY_EMAIL_URL}
+
+
+
 
