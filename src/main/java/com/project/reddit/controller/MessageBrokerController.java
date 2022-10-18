@@ -1,10 +1,11 @@
 package com.project.reddit.controller;
 
 import com.google.gson.Gson;
-import com.project.reddit.dto.comment.CommentDto;
 import com.project.reddit.dto.post.PostDto;
 import com.project.reddit.exception.NotFoundException;
+import com.project.reddit.kafka.service.generic.model.PostCommentNotificationModel;
 import com.project.reddit.mapper.AbstractPostMapper;
+import com.project.reddit.mapper.AbstractUserMapper;
 import com.project.reddit.repository.UserRepository;
 import com.project.reddit.service.CommentService;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,8 @@ public class MessageBrokerController<T>{
     private final SimpMessagingTemplate messagingTemplate;
 
     private final AbstractPostMapper postMapper;
+
+    private final AbstractUserMapper userMapper;
 
 
 
@@ -62,7 +65,8 @@ public class MessageBrokerController<T>{
 
         //send notification to followers
         findUser.getFollowers().forEach(user -> {
-            messagingTemplate.convertAndSendToUser(user.getFrom().getUsername(), "/queue/notification", postDto);
+            userMapper.userNotification2(postDto);
+            messagingTemplate.convertAndSendToUser(user.getFrom().getUsername(), "/queue/notification", userMapper.userNotification2(postDto));
             //save users not
             user.getFrom().getNotifications().add(postMapper.postDtoToEntity(postDto));
             userRepository.save(user.getFrom());
@@ -77,19 +81,20 @@ public class MessageBrokerController<T>{
         acknowledgment.acknowledge();
     }
 
-    /*
-    * Whenever a action happends on user profile like delete post, update post or update profile
-    * it should be sent thru ws so every1 can see it in rt
-    * */
     @KafkaListener(topics = "USER_PROFILE_NOTIFICATION", containerFactory = "kafkaListenerContainerFactory")
     public void afterUserDeletesOrUpdatesPost(@Payload String body, Acknowledgment acknowledgment) {
        // messagingTemplate.convertAndSend("/topic/user", );
     }
 
     @KafkaListener(topics = "COMMENT_NOTIFICATION", containerFactory = "kafkaListenerContainerFactory")
-    public void afterCommentIsUploaded(@Payload String body, Acknowledgment acknowledgment) {
-        var object = (CommentDto) fromJsonToObject(body, CommentDto.class);
-        messagingTemplate.convertAndSend("/topic/comment", commentService.getAllCommentsByPostId(1L));
+    public void afterCommentIsUploaded(@Payload PostCommentNotificationModel postCommentNotificationModel, Acknowledgment acknowledgment) {
+        messagingTemplate.convertAndSend("/topic/comment/" + postCommentNotificationModel.getPostId(), postCommentNotificationModel.getCommentDto());
+        acknowledgment.acknowledge();
+    }
+
+    @KafkaListener(topics = "DELETE_COMMENT_NOTIFICATION", containerFactory = "kafkaListenerContainerFactory")
+    public void sendMsgAfterCommentIsDeleted(@Payload Long postId){
+        messagingTemplate.convertAndSend("/topic/comment/" + postId, "COMMENT_DELETED");
     }
 
 

@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-@Mapper(componentModel = "spring", uses = {AbstractCommentMapper.class}, collectionMappingStrategy = CollectionMappingStrategy.ADDER_PREFERRED)
+@Mapper(componentModel = "spring", uses = {AbstractCommentMapper.class})
 @RequiredArgsConstructor
 public abstract class AbstractPostMapper {
 
