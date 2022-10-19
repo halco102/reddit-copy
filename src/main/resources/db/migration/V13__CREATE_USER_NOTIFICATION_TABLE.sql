@@ -1,4 +1,4 @@
-create table user_notifications(
+create table if not exists user_notifications(
 users_id int8,
 posts_id int8,
 
