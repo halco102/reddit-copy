@@ -75,14 +75,14 @@ public class User {
     @JoinTable(name = "user_notifications", joinColumns = @JoinColumn(name = "users_id"), inverseJoinColumns = @JoinColumn(name = "posts_id"))
     private Set<Post> notifications = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_follow", joinColumns = @JoinColumn(name = "person_id"), inverseJoinColumns = @JoinColumn(name = "follow_id"))
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Set<User> followers = new HashSet<>();
 
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_follow", joinColumns = @JoinColumn(name = "follow_id"), inverseJoinColumns = @JoinColumn(name = "person_id"))
     @ToString.Exclude
     @EqualsAndHashCode.Exclude

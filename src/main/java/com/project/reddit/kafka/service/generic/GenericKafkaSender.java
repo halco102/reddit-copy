@@ -16,12 +16,6 @@ public class GenericKafkaSender<T> {
 
     private final KafkaTemplate<String, T> kafkaTemplate;
 
-    private String objectToJson(T o) {
-        var gson = new Gson();
-
-        return gson.toJson(o);
-    }
-
     public void sendMessageWithCallback(T message, String topic) {
 
         System.out.println(message);

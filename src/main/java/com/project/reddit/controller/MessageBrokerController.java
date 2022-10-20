@@ -1,8 +1,9 @@
 package com.project.reddit.controller;
 
-import com.google.gson.Gson;
 import com.project.reddit.dto.post.PostDto;
 import com.project.reddit.exception.NotFoundException;
+import com.project.reddit.kafka.service.generic.model.LikeDislikeCommentNotificationModel;
+import com.project.reddit.kafka.service.generic.model.LikeDislikePostNotificationModel;
 import com.project.reddit.kafka.service.generic.model.PostCommentNotificationModel;
 import com.project.reddit.mapper.AbstractPostMapper;
 import com.project.reddit.mapper.AbstractUserMapper;
@@ -16,12 +17,10 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
-import java.util.List;
-
 @Controller
 @Slf4j
 @RequiredArgsConstructor
-public class MessageBrokerController<T>{
+public class MessageBrokerController{
 
 
     private final UserRepository userRepository;
@@ -33,21 +32,6 @@ public class MessageBrokerController<T>{
     private final AbstractPostMapper postMapper;
 
     private final AbstractUserMapper userMapper;
-
-
-
-    private T fromJsonToObject(String json, Class<?> toClass) {
-        Gson gson = new Gson();
-
-        if (toClass == List.class) {
-            log.info("ListClass");
-            //return gson.toJson(json);
-            return (T) gson.toJson(json);
-        }
-
-        return (T) gson.fromJson(json, toClass);
-        //return gson.fromJson(json, toClass);
-    }
 
 
     //TODO
@@ -62,16 +46,24 @@ public class MessageBrokerController<T>{
     public void sendNotificationAfterPostIsSaved(@Payload PostDto postDto, Acknowledgment acknowledgment){
 
         var findUser = userRepository.findById(postDto.getPostedBy().getId()).orElseThrow(() -> new NotFoundException("User was not found"));
-
+/*
         //send notification to followers
         findUser.getFollowers().forEach(user -> {
             userMapper.userNotification2(postDto);
             messagingTemplate.convertAndSendToUser(user.getFrom().getUsername(), "/queue/notification", userMapper.userNotification2(postDto));
-            //save users not
+
             user.getFrom().getNotifications().add(postMapper.postDtoToEntity(postDto));
             userRepository.save(user.getFrom());
-        });
+        });*/
 
+
+        findUser.getFollowers().forEach(user -> {
+            log.info(user.getUsername());
+            log.info(userMapper.userNotificationFromPostDto(postDto).toString());
+            messagingTemplate.convertAndSendToUser(user.getUsername(), "/queue/notification", userMapper.userNotificationFromPostDto(postDto));
+            user.getNotifications().add(postMapper.postDtoToEntity(postDto));
+            userRepository.save(user);
+        });
         acknowledgment.acknowledge();
     }
 
@@ -81,11 +73,6 @@ public class MessageBrokerController<T>{
         acknowledgment.acknowledge();
     }
 
-    @KafkaListener(topics = "USER_PROFILE_NOTIFICATION", containerFactory = "kafkaListenerContainerFactory")
-    public void afterUserDeletesOrUpdatesPost(@Payload String body, Acknowledgment acknowledgment) {
-       // messagingTemplate.convertAndSend("/topic/user", );
-    }
-
     @KafkaListener(topics = "COMMENT_NOTIFICATION", containerFactory = "kafkaListenerContainerFactory")
     public void afterCommentIsUploaded(@Payload PostCommentNotificationModel postCommentNotificationModel, Acknowledgment acknowledgment) {
         messagingTemplate.convertAndSend("/topic/comment/" + postCommentNotificationModel.getPostId(), postCommentNotificationModel.getCommentDto());
@@ -93,63 +80,23 @@ public class MessageBrokerController<T>{
     }
 
     @KafkaListener(topics = "DELETE_COMMENT_NOTIFICATION", containerFactory = "kafkaListenerContainerFactory")
-    public void sendMsgAfterCommentIsDeleted(@Payload Long postId){
+    public void sendMsgAfterCommentIsDeleted(@Payload Long postId, Acknowledgment acknowledgment){
         messagingTemplate.convertAndSend("/topic/comment/" + postId, "COMMENT_DELETED");
+        acknowledgment.acknowledge();
+    }
+
+    @KafkaListener(topics = "LIKE_OR_DISLIKE_POST_NOTIFICATION", containerFactory = "kafkaListenerContainerFactory")
+    public void triggerEventWhenUserLikesOrDislikesPost(@Payload LikeDislikePostNotificationModel body, Acknowledgment acknowledgment) {
+        messagingTemplate.convertAndSend("/topic/post/like-dislike", body);
+        acknowledgment.acknowledge();
     }
 
 
-
-
-/*
-    @MessageMapping("/post")
-    @SendTo("/topic/post")
-    @Transactional
-    public List<PostDto> savedNewPost(List<PostDto> postDtos) {
-        log.info("A user saved a post, now we need to send his state to all subscribers");
-        if (postDtos.isEmpty() || !postDtos.isEmpty()){
-            return this.postService.getAllPosts();
-        }
-        return null;
+    @KafkaListener(topics = "LIKE_OR_DISLIKE_COMMENT_NOTIFICATION", containerFactory = "kafkaListenerContainerFactory")
+    public void triggerEventWhenUserLikesOrDislikesComment(@Payload LikeDislikeCommentNotificationModel body, Acknowledgment acknowledgment) {
+        messagingTemplate.convertAndSend("/topic/comment/" + body.getPostId() + "/like-dislike", body);
+        acknowledgment.acknowledge();
     }
 
-    @MessageMapping("/post/delete")
-    @SendTo("/topic/post")
-    @Transactional
-    public List<PostDto> deletedPost(String deleted) {
-        log.info("Post was deleted");
-        if (deleted.matches("POST_DELETED")) {
-            var temp = postService.getAllPosts();
-            return temp;
-        }
-        log.info("POST_DELETED NULL");
-        return null;
-    }
-
-    @MessageMapping("/comment")
-    @SendTo("/topic/comment")
-    @Transactional
-    public List<CommentDto> savedNewComment(List<CommentDto> commentDtos) {
-        log.info("A user posted a new comment, send his state to all subscribed users");
-        // or myb call db ?
-        return sortingCommentsInterface.sortingComments(commentDtos);
-    }
-
-    @MessageMapping("/comment/delete")
-    @SendTo("/topic/comment")
-    @Transactional
-    public List<CommentDto> deletedComment(Long postId) {
-        log.info("A comment was deleted");
-        return this.commentService.getAllCommentsByPostId(postId);
-    }
-
-    @MessageMapping("/user/update")
-    @SendTo("/topic/user")
-    @Transactional
-    public UserProfileDto userProfileDtoChanged(UserProfileDto userProfileDto) {
-        log.info("Specific user" + userProfileDto);
-        //simpMessagingTemplate.convertAndSendToUser(principal.getName(), "/topic/user", this.userService.getUserProfileByUsernameOrId(null, id));
-        messagingTemplate.convertAndSend("/topic/post", postService.getAllPosts());
-        return this.userService.getUserProfileByUsernameOrId(null, userProfileDto.getId());
-    }*/
 
 }

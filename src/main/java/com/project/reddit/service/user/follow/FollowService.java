@@ -2,6 +2,7 @@ package com.project.reddit.service.user.follow;
 
 import com.project.reddit.dto.user.UserProfileDto;
 import com.project.reddit.exception.BadRequestException;
+import com.project.reddit.exception.DuplicateException;
 import com.project.reddit.mapper.AbstractUserMapper;
 import com.project.reddit.repository.UserRepository;
 import com.project.reddit.service.user.UserService;
@@ -27,6 +28,10 @@ public class FollowService implements IFollow{
 
         if (currentlyLoggedUser.getId() == findUserToFollow.getId()) {
             throw new BadRequestException("Cant follow yourself");
+        }
+
+        if (currentlyLoggedUser.getFollowing().stream().anyMatch(e -> e.getId() == id)) {
+            throw new DuplicateException("Duplicate");
         }
 
         currentlyLoggedUser.getFollowing().add(findUserToFollow);
