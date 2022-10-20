@@ -9,7 +9,6 @@ import com.project.reddit.model.content.Post;
 import com.project.reddit.model.likedislike.CommentLikeOrDislike;
 import com.project.reddit.model.likedislike.PostLikeOrDislike;
 import com.project.reddit.model.message.Comment;
-import com.project.reddit.model.user.follow.Follows;
 import lombok.*;
 
 import javax.persistence.*;
@@ -72,16 +71,22 @@ public class User {
     @Column(name = "verified")
     private boolean verified;
 
-    @OneToMany(mappedBy = "from", fetch = FetchType.EAGER)
-    private Set<Follows> following;
-
-    @OneToMany(mappedBy = "to", fetch = FetchType.EAGER)
-    private Set<Follows> followers;
-
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_notifications", joinColumns = @JoinColumn(name = "users_id"), inverseJoinColumns = @JoinColumn(name = "posts_id"))
     private Set<Post> notifications = new HashSet<>();
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_follow", joinColumns = @JoinColumn(name = "person_id"), inverseJoinColumns = @JoinColumn(name = "follow_id"))
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<User> followers = new HashSet<>();
+
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_follow", joinColumns = @JoinColumn(name = "follow_id"), inverseJoinColumns = @JoinColumn(name = "person_id"))
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<User> following = new HashSet<>();
 
 
     public User(Long id, String username, String password, String email, LocalDate createdAt, String imageUrl, UserRole role) {

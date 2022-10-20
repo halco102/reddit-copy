@@ -4,6 +4,7 @@ import com.project.reddit.dto.user.login.UserLoginRequestDto;
 import com.project.reddit.dto.user.signup.UserSignupRequestDto;
 import com.project.reddit.service.user.UserService;
 import com.project.reddit.service.user.follow.FollowService;
+import com.project.reddit.service.user.follow.IFollow;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ public class UserController {
 
     private final UserService userService;
 
-    private final FollowService followService;
+    private final IFollow followInterface;
 
 
     @PostMapping()
@@ -58,8 +59,15 @@ public class UserController {
         return new ResponseEntity<>(this.userService.checkIfJwtIsValid(jwt), HttpStatus.OK);
     }
 
-    @PostMapping("/user/follow/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
+    @PostMapping("/follow/{id}")
     public ResponseEntity<?> followUserById(@PathVariable Long id) {
-        return new ResponseEntity<>(followService.followUser(id), HttpStatus.OK);
+        return new ResponseEntity<>(followInterface.followUser(id), HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
+    @PostMapping("/unfollow/{id}")
+    public ResponseEntity<?> unfollowUserById(@PathVariable Long id) {
+        return new ResponseEntity<>(followInterface.unfollowUser(id), HttpStatus.OK);
     }
 }
