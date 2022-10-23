@@ -9,6 +9,7 @@ import com.project.reddit.mapper.AbstractPostMapper;
 import com.project.reddit.mapper.AbstractUserMapper;
 import com.project.reddit.repository.UserRepository;
 import com.project.reddit.service.CommentService;
+import com.project.reddit.service.post.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -33,6 +34,7 @@ public class MessageBrokerController{
 
     private final AbstractUserMapper userMapper;
 
+    private final PostService postService;
 
     //TODO
     /*
@@ -45,23 +47,17 @@ public class MessageBrokerController{
     @KafkaListener(topics = "FOLLOWER_NOTIFICATION", containerFactory="kafkaListenerContainerFactory")
     public void sendNotificationAfterPostIsSaved(@Payload PostDto postDto, Acknowledgment acknowledgment){
 
+
+
         var findUser = userRepository.findById(postDto.getPostedBy().getId()).orElseThrow(() -> new NotFoundException("User was not found"));
-/*
-        //send notification to followers
-        findUser.getFollowers().forEach(user -> {
-            userMapper.userNotification2(postDto);
-            messagingTemplate.convertAndSendToUser(user.getFrom().getUsername(), "/queue/notification", userMapper.userNotification2(postDto));
-
-            user.getFrom().getNotifications().add(postMapper.postDtoToEntity(postDto));
-            userRepository.save(user.getFrom());
-        });*/
-
 
         findUser.getFollowers().forEach(user -> {
-            log.info(user.getUsername());
-            log.info(userMapper.userNotificationFromPostDto(postDto).toString());
+
             messagingTemplate.convertAndSendToUser(user.getUsername(), "/queue/notification", userMapper.userNotificationFromPostDto(postDto));
-            user.getNotifications().add(postMapper.postDtoToEntity(postDto));
+
+            //user who is going to save the notification that he got
+            user.getNotifications().add(postService.getPostEntityById(postDto.getId()));
+
             userRepository.save(user);
         });
         acknowledgment.acknowledge();
