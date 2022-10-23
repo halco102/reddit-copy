@@ -1,6 +1,5 @@
 package com.project.reddit.kafka.service.generic;
 
-import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
