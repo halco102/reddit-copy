@@ -18,6 +18,7 @@ import com.project.reddit.mapper.AbstractCommentMapper;
 import com.project.reddit.mapper.AbstractUserMapper;
 import com.project.reddit.model.user.User;
 import com.project.reddit.model.user.UserRole;
+import com.project.reddit.repository.IUserEntityManager;
 import com.project.reddit.repository.UserRepository;
 import com.project.reddit.security.CustomUserDetailsImp;
 import com.project.reddit.security.JwtTokenUtil;
@@ -69,6 +70,7 @@ public class UserService {
     @Value("${VERIFY_EMAIL_URL}")
     private String verifyEmailUrl;
 
+    private final IUserEntityManager iUserEntityManager;
 
 
 
@@ -330,11 +332,12 @@ public class UserService {
     }
 
 
+
     public Set<UserNotification> getAllNotifications(){
         var currentUser = getCurrentlyLoggedUser();
+        var fetchUserNotifications = iUserEntityManager.getUserNotificationsFromTempTable(currentUser.getId());
 
-        return currentUser.getNotifications()
-                .stream()
-                .map(m -> userMapper.userNotification(m)).collect(Collectors.toSet());
+        //var t = userRepository.temp();
+        return fetchUserNotifications;
     }
 }
