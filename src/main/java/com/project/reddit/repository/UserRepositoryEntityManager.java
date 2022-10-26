@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.criteria.Join;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -23,6 +24,7 @@ public class UserRepositoryEntityManager implements IUserEntityManager{
     @Override
     public Set<UserNotification> getUserNotificationsFromTempTable(Long userId) {
 
+
         Query query1 = entityManager.createNativeQuery("Select \n" +
                 "u.id as usersId, \n" +
                 "u.username, \n" +
@@ -32,7 +34,7 @@ public class UserRepositoryEntityManager implements IUserEntityManager{
                 "p.image_url as postImage \n" +
                 "from user_notifications_temp as unt\n" +
                 "inner join users as u on unt.users_id = u.id\n" +
-                "inner join posts as p on unt.posts_id = p.id");
+                "left join posts as p on unt.posts_id = p.id");
 
 
         List<Object> result = (List<Object>) query1.getResultList();
@@ -45,9 +47,11 @@ public class UserRepositoryEntityManager implements IUserEntityManager{
                     Long.parseLong(String.valueOf(objects[0])),
                     String.valueOf(objects[1]),
                     String.valueOf(objects[2]),
-                    Long.parseLong(String.valueOf(objects[3])),
-                    String.valueOf(objects[4]),
-                    String.valueOf(objects[5])
+
+                    //potential nulls
+                    objects[3] != null ? Long.parseLong(String.valueOf(objects[3])) : null,
+                    objects[4] != null ? String.valueOf(objects[4]) : null,
+                    objects[5] != null ? String.valueOf(objects[5]) : null
             ));
         }
 
