@@ -113,6 +113,11 @@ public class PostService implements PostInterface, PostCategory{
         }
 
         if (user.getPosts().stream().anyMatch(item -> item.equals(post.get()))) {
+
+            if (post.get().getNotifications().size() > 0) {
+                post.get().getNotifications().forEach(notifier -> notifier.deleteNotificationElement(post.get()));
+            }
+
             // can delete
             postRepository.deleteById(id);
             log.info("Post deleted");

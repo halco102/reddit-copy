@@ -33,18 +33,16 @@ public class PostDto {
 
     private LocalDateTime createdAt;
 
+    private boolean allowComments;
+
     @NotNull
     @NotBlank
     private UserInfo postedBy;
 
     private List<CommentDto> commentsDto = new ArrayList<>();
 
-    private boolean allowComments;
-
     private List<PostLikeOrDislikeDto> postLikeOrDislikeDtos = new ArrayList<>();
 
     private Set<CategoryDto> categories;
-
-
 
 }

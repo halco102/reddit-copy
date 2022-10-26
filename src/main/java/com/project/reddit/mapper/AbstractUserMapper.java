@@ -58,12 +58,12 @@ public abstract class AbstractUserMapper {
             @Mapping(target = "notifications", source = "post"),
             @Mapping(target = "userInfo", source = "post.user")
     })
-    public abstract UserNotification userNotification(Post post);
+    public abstract UserNotification userNotificationFromPost(Post post);
 
     @Mappings({
             @Mapping(target = "notifications", source = "post"),
             @Mapping(target = "userInfo", source = "post.postedBy")
     })
-    public abstract UserNotification userNotification2(PostDto post);
+    public abstract UserNotification userNotificationFromPostDto(PostDto post);
 
 }
