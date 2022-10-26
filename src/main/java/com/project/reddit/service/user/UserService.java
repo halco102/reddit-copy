@@ -336,8 +336,6 @@ public class UserService {
     public Set<UserNotification> getAllNotifications(){
         var currentUser = getCurrentlyLoggedUser();
         var fetchUserNotifications = iUserEntityManager.getUserNotificationsFromTempTable(currentUser.getId());
-
-        //var t = userRepository.temp();
         return fetchUserNotifications;
     }
 }
