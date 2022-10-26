@@ -44,7 +44,7 @@ public class FollowService implements IFollow{
     public UserProfileDto unfollowUser(Long id) {
         var currentlyLoggedUser = userService.getCurrentlyLoggedUser();
 
-        currentlyLoggedUser.getFollowers().removeIf(e -> e.getId() == id);
+        currentlyLoggedUser.getFollowing().removeIf(e -> e.getId() == id);
 
         var saveUser = userRepository.save(currentlyLoggedUser);
 
