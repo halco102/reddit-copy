@@ -72,7 +72,7 @@ public class User {
     @Column(name = "verified")
     private boolean verified;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_notifications", joinColumns = @JoinColumn(name = "users_id"), inverseJoinColumns = @JoinColumn(name = "posts_id"))
     private Set<Post> notifications = new HashSet<>();
 
@@ -106,5 +106,14 @@ public class User {
         this.email = email;
     }
 
+
+    public void deleteNotificationElement(Post post) {
+
+        if (post.getNotifications().size() > 0) {
+            notifications.remove(post);
+            post.getNotifications().remove(this);
+        }
+
+    }
 
 }
