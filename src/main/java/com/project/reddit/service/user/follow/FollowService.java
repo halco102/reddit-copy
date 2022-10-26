@@ -1,7 +1,8 @@
 package com.project.reddit.service.user.follow;
 
 import com.project.reddit.dto.user.UserProfileDto;
-import com.project.reddit.mapper.AbstractFollowMapper;
+import com.project.reddit.exception.BadRequestException;
+import com.project.reddit.exception.DuplicateException;
 import com.project.reddit.mapper.AbstractUserMapper;
 import com.project.reddit.repository.UserRepository;
 import com.project.reddit.service.user.UserService;
@@ -18,26 +19,35 @@ public class FollowService implements IFollow{
 
     private final AbstractUserMapper mapper;
 
-    private final AbstractFollowMapper followMapper;
-
     private final UserService userService;
 
     @Override
     public UserProfileDto followUser(Long id) {
         var currentlyLoggedUser = userService.getCurrentlyLoggedUser();
-
         var findUserToFollow = userService.getUserById(id);
 
-        var temp = followMapper.toFollwing(currentlyLoggedUser.getFollowing());
-        temp.add(followMapper.fromUserToFollowDto(findUserToFollow));
+        if (currentlyLoggedUser.getId() == findUserToFollow.getId()) {
+            throw new BadRequestException("Cant follow yourself");
+        }
 
-        currentlyLoggedUser.setFollowing(followMapper.fromDtoToEntity(temp));
+        if (currentlyLoggedUser.getFollowing().stream().anyMatch(e -> e.getId() == id)) {
+            throw new DuplicateException("Duplicate");
+        }
+
+        currentlyLoggedUser.getFollowing().add(findUserToFollow);
+
         var saveUser = userRepository.save(currentlyLoggedUser);
         return mapper.userProfileDto(saveUser);
     }
 
     @Override
     public UserProfileDto unfollowUser(Long id) {
-        return null;
+        var currentlyLoggedUser = userService.getCurrentlyLoggedUser();
+
+        currentlyLoggedUser.getFollowing().removeIf(e -> e.getId() == id);
+
+        var saveUser = userRepository.save(currentlyLoggedUser);
+
+        return mapper.userProfileDto(saveUser);
     }
 }

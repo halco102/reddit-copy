@@ -32,7 +32,6 @@ public class WebSocketOverStompConfig implements WebSocketMessageBrokerConfigure
         registry.enableSimpleBroker("/topic", "/queue", "/user");
         registry.setApplicationDestinationPrefixes("/app");
         registry.setUserDestinationPrefix("/users");
-        registry.setUserDestinationPrefix("/posts");
 
     }
 }

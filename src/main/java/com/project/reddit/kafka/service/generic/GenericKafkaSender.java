@@ -1,6 +1,5 @@
 package com.project.reddit.kafka.service.generic;
 
-import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -15,12 +14,6 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 public class GenericKafkaSender<T> {
 
     private final KafkaTemplate<String, T> kafkaTemplate;
-
-    private String objectToJson(T o) {
-        var gson = new Gson();
-
-        return gson.toJson(o);
-    }
 
     public void sendMessageWithCallback(T message, String topic) {
 

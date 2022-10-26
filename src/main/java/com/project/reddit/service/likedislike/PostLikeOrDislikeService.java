@@ -1,8 +1,11 @@
 package com.project.reddit.service.likedislike;
 
+import com.project.reddit.constants.KafkaNotifications;
 import com.project.reddit.dto.likeordislike.LikeOrDislikeRequest;
 import com.project.reddit.dto.post.PostDto;
 import com.project.reddit.exception.NotFoundException;
+import com.project.reddit.kafka.service.generic.NotificationContext;
+import com.project.reddit.kafka.service.generic.model.LikeDislikePostNotificationModel;
 import com.project.reddit.mapper.AbstractPostMapper;
 import com.project.reddit.model.content.Post;
 import com.project.reddit.model.likedislike.EmbedablePostLikeOrDislike;
@@ -13,6 +16,7 @@ import com.project.reddit.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Component
@@ -25,7 +29,10 @@ public class PostLikeOrDislikeService implements ILikeOrDislike<PostDto, LikeOrD
 
     private final AbstractPostMapper postMapper;
 
+    private final NotificationContext notificationContext;
+
     @Override
+    @Transactional
     public PostDto likeOrDislike(LikeOrDislikeRequest request) {
 
         var getPostById = this.postRepository.findById(request.getId());
@@ -65,7 +72,14 @@ public class PostLikeOrDislikeService implements ILikeOrDislike<PostDto, LikeOrD
         }
 
         var savePost = this.postRepository.save(getPostById.get());
-        return postMapper.toPostDto(savePost);
+
+
+        var postDto = postMapper.toPostDto(savePost);
+
+        notificationContext.sendMessageToKafka(KafkaNotifications.LIKE_OR_DISLIKE_POST_NOTIFICATION, new LikeDislikePostNotificationModel(
+               postDto, "LIKE_OR_DISLIKE_POST"), KafkaNotifications.LIKE_OR_DISLIKE_POST_NOTIFICATION.name());
+
+        return postDto;
     }
 
     /*

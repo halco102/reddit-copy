@@ -1,8 +1,11 @@
 package com.project.reddit.service.likedislike;
 
+import com.project.reddit.constants.KafkaNotifications;
 import com.project.reddit.dto.comment.CommentDto;
 import com.project.reddit.dto.likeordislike.CommentLikeOrDislikeRequest;
 import com.project.reddit.exception.NotFoundException;
+import com.project.reddit.kafka.service.generic.NotificationContext;
+import com.project.reddit.kafka.service.generic.model.LikeDislikeCommentNotificationModel;
 import com.project.reddit.mapper.AbstractCommentMapper;
 import com.project.reddit.model.likedislike.CommentLikeOrDislike;
 import com.project.reddit.model.likedislike.EmbedableCommentLikeOrDislike;
@@ -13,6 +16,7 @@ import com.project.reddit.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Component
@@ -25,6 +29,9 @@ public class CommentLikeOrDislikeService implements ILikeOrDislike<CommentDto, C
 
     private final UserService userService;
 
+    private final NotificationContext notificationContext;
+
+    @Transactional
     @Override
     public CommentDto likeOrDislike(CommentLikeOrDislikeRequest request) {
         // find the requested comment
@@ -75,6 +82,13 @@ public class CommentLikeOrDislikeService implements ILikeOrDislike<CommentDto, C
         var com = this.commentRepository.save(comment.get());
 
         var commentDto = commentMapper.toDto(com);
+
+        notificationContext.sendMessageToKafka(KafkaNotifications.LIKE_OR_DISLIKE_COMMENT_NOTIFICATION, new LikeDislikeCommentNotificationModel(
+                commentDto,
+                "LIKE_OR_DISLIKE_COMMENT",
+                com.getPost().getId()
+        ), KafkaNotifications.LIKE_OR_DISLIKE_COMMENT_NOTIFICATION.name());
+
         return commentDto;
     }
 
