@@ -7,9 +7,8 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import javax.persistence.criteria.Join;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -25,21 +24,19 @@ public class UserRepositoryEntityManager implements IUserEntityManager{
     public Set<UserNotification> getUserNotificationsFromTempTable(Long userId) {
 
 
-        Query query1 = entityManager.createNativeQuery("Select \n" +
-                "u.id as usersId, \n" +
-                "u.username, \n" +
-                "u.image_url as usersImage, \n" +
-                "p.id as postsId, \n" +
-                "p.title, \n" +
-                "p.image_url as postImage \n" +
-                "from user_notifications_temp as unt\n" +
-                "inner join users as u on unt.users_id = u.id\n" +
-                "left join posts as p on unt.posts_id = p.id");
+        Query query1 = entityManager.createNativeQuery("select pu.id as postedById," +
+                " pu.username, pu.image_url as userImage," +
+                "p.id as postsId, p.title, p.image_url as postImageUrl  from user_notifications_temp unt \n" +
+                "inner join users u on unt.users_id  = u.id\n" +
+                "left join posts p on unt.posts_id = p.id\n" +
+                "inner join users pu on p.users_id = pu.id \n" +
+                "where unt.users_id = ?1 order by p.created_at desc").setParameter(1, userId);
 
 
         List<Object> result = (List<Object>) query1.getResultList();
         Iterator iterator = result.listIterator();
-        Set<UserNotification> userNotifications = new HashSet<>();
+        Set<UserNotification> userNotifications = new LinkedHashSet<>();
+
 
         while (iterator.hasNext()){
             Object[] objects = (Object[]) iterator.next();
