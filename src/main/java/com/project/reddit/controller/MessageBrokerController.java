@@ -5,10 +5,8 @@ import com.project.reddit.exception.NotFoundException;
 import com.project.reddit.kafka.service.generic.model.LikeDislikeCommentNotificationModel;
 import com.project.reddit.kafka.service.generic.model.LikeDislikePostNotificationModel;
 import com.project.reddit.kafka.service.generic.model.PostCommentNotificationModel;
-import com.project.reddit.mapper.AbstractPostMapper;
 import com.project.reddit.mapper.AbstractUserMapper;
 import com.project.reddit.repository.UserRepository;
-import com.project.reddit.service.CommentService;
 import com.project.reddit.service.post.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,20 +24,12 @@ public class MessageBrokerController{
 
     private final UserRepository userRepository;
 
-    private final CommentService commentService;
-
     private final SimpMessagingTemplate messagingTemplate;
-
-    private final AbstractPostMapper postMapper;
 
     private final AbstractUserMapper userMapper;
 
     private final PostService postService;
 
-    //TODO
-    /*
-    * Change everything to kafka later
-    * */
 
     /*
     * This method is used for sending PostDto object to all followers of one user
@@ -47,15 +37,12 @@ public class MessageBrokerController{
     @KafkaListener(topics = "FOLLOWER_NOTIFICATION", containerFactory="kafkaListenerContainerFactory")
     public void sendNotificationAfterPostIsSaved(@Payload PostDto postDto, Acknowledgment acknowledgment){
 
-
-
         var findUser = userRepository.findById(postDto.getPostedBy().getId()).orElseThrow(() -> new NotFoundException("User was not found"));
 
         findUser.getFollowers().forEach(user -> {
 
             messagingTemplate.convertAndSendToUser(user.getUsername(), "/queue/notification", userMapper.userNotificationFromPostDto(postDto));
 
-            //user who is going to save the notification that he got
             user.getNotifications().add(postService.getPostEntityById(postDto.getId()));
 
             userRepository.save(user);
