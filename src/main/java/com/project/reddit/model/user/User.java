@@ -5,17 +5,18 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import com.project.reddit.dto.user.notification.UserNotification;
 import com.project.reddit.model.content.Post;
 import com.project.reddit.model.likedislike.CommentLikeOrDislike;
 import com.project.reddit.model.likedislike.PostLikeOrDislike;
 import com.project.reddit.model.message.Comment;
 import lombok.*;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Getter
@@ -24,7 +25,6 @@ import java.util.Set;
 @Table(name = "users")
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
 public class User {
 
     @Id
@@ -73,10 +73,6 @@ public class User {
     private boolean verified;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_notifications", joinColumns = @JoinColumn(name = "users_id"), inverseJoinColumns = @JoinColumn(name = "posts_id"))
-    private Set<Post> notifications = new HashSet<>();
-
-    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_follow", joinColumns = @JoinColumn(name = "person_id"), inverseJoinColumns = @JoinColumn(name = "follow_id"))
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
@@ -88,6 +84,20 @@ public class User {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Set<User> following = new HashSet<>();
+
+    /*
+    * Notifications
+    * */
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_notifications",
+            joinColumns = @JoinColumn(name = "users_id"),
+            inverseJoinColumns = @JoinColumn(name = "posts_id")
+    )
+    private Set<Post> notifications = new HashSet<>();
+
+
+
 
 
     public User(Long id, String username, String password, String email, LocalDate createdAt, String imageUrl, UserRole role) {
@@ -114,6 +124,19 @@ public class User {
             post.getNotifications().remove(this);
         }
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        User user = (User) o;
+        return id != null && Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 
 }
