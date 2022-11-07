@@ -75,14 +75,12 @@ public class User {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_follow", joinColumns = @JoinColumn(name = "person_id"), inverseJoinColumns = @JoinColumn(name = "follow_id"))
     @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Set<User> followers = new HashSet<>();
 
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_follow", joinColumns = @JoinColumn(name = "follow_id"), inverseJoinColumns = @JoinColumn(name = "person_id"))
     @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Set<User> following = new HashSet<>();
 
     /*
@@ -95,9 +93,6 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "posts_id")
     )
     private Set<Post> notifications = new HashSet<>();
-
-
-
 
 
     public User(Long id, String username, String password, String email, LocalDate createdAt, String imageUrl, UserRole role) {
