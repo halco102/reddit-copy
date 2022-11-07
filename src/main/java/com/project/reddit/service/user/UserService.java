@@ -105,13 +105,13 @@ public class UserService {
     }
 
     private void sendVerificationEmail(User user) throws MessagingException {
-        String verifyUrl = verifyEmailUrl + "/api/v1/user/verify/" + user.getVerificationCode();
+        String verifyUrl = "http://" + verifyEmailUrl + "/api/v1/user/verify/" + user.getVerificationCode();
         
         String toAddress = user.getEmail();
         String fromAddress = this.email;
         String subject = "Successfully register in Reddit copy app ";
-        String content = "Dear " + user.getUsername() + " thank you for signin up my project website.\n\n" +
-                "Please follow this link <a href =" + verifyUrl + "> Verify here </a>"+ " <br>" +
+        String content = "Dear " + user.getUsername() + " thank you for signing up my project website.\n\n" +
+                "Please follow this link <a href =\" " + verifyUrl + "\"> Verify here </a>"+ " <br>" +
                 "I hope you like it.<br>" +
                 "Best regards " + "<br>" +
                 "Halco";
