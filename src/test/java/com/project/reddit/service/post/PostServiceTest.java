@@ -2,6 +2,7 @@ package com.project.reddit.service.post;
 
 import com.project.reddit.dto.category.CategoryDto;
 import com.project.reddit.dto.post.PostDto;
+import com.project.reddit.dto.post.UpdatePostDto;
 import com.project.reddit.dto.user.UserInfo;
 import com.project.reddit.exception.BadRequestException;
 import com.project.reddit.exception.NotFoundException;
@@ -279,5 +280,66 @@ class PostServiceTest {
         Assertions.assertThrows(NotFoundException.class, () -> postService.sortPostByNumberOfDislikes());
     }
 
+    @Test
+    public void updatePostByIdTest() {
+
+        UpdatePostDto updatePostDto = new UpdatePostDto("newTitle",
+                "newText",
+                true,
+                new HashSet<>(Arrays.asList(new CategoryDto(10L, "newCategory", "newIcon"))));
+
+        var toReturnDtoAfterUpdate1 = new PostDto(1L, updatePostDto.getTitle(), updatePostDto.getText(),
+                "imageUrl", LocalDateTime.MAX,
+                LocalDateTime.MIN, updatePostDto.isAllowComments(),
+                postDtos.get(0).getPostedBy(), postDtos.get(0).getCommentsDto(),
+                postDtos.get(0).getPostLikeOrDislikeDtos(),
+                updatePostDto.getCategories());
+
+        var category = new Category(10L, "newCategory", "newIcon", new ArrayList<>());
+
+        //new post
+        var newPost1 = posts.get(0);
+        newPost1.setText(updatePostDto.getText());
+        newPost1.setTitle(updatePostDto.getTitle());
+        newPost1.setEditedAt(LocalDateTime.MAX);
+        newPost1.getCategories().clear();
+        newPost1.getCategories().add(category);
+        newPost1.setAllowComments(updatePostDto.isAllowComments());
+        newPost1.setCreatedAt(LocalDateTime.MIN);
+
+        Mockito.when(postRepository.findById(1L)).thenReturn(Optional.ofNullable(posts.get(0)));
+        Mockito.when(categoryMapper.toCategoryEntity(Mockito.any())).thenReturn(category);
+        Mockito.when(postMapper.toPostDto(Mockito.any(Post.class))).thenReturn(toReturnDtoAfterUpdate1);
+        Mockito.when(postRepository.save(Mockito.any(Post.class))).thenReturn(newPost1);
+
+
+        //test when whole request is used
+        var toTest1 = postService.updatePostById(1L, updatePostDto);
+
+        Assertions.assertEquals(toTest1.getId(), posts.get(0).getId());
+        Assertions.assertEquals(toTest1.getEditedAt(), LocalDateTime.MAX);
+        Assertions.assertEquals(toTest1.getCategories().size(), updatePostDto.getCategories().size());
+        Assertions.assertEquals(toTest1.getCategories().stream().findFirst().get().getId(), updatePostDto.getCategories().stream().findFirst().get().getId());
+        Assertions.assertEquals(toTest1.getTitle(), updatePostDto.getTitle());
+        Assertions.assertEquals(toTest1.getText(), updatePostDto.getText());
+        Assertions.assertEquals(toTest1.isAllowComments(), updatePostDto.isAllowComments());
+
+
+    }
+
+    @Test
+    public void updatePostByIdThrowBadRequestExceptionWhenRequestIsNullOrTitleInRequestIsNull() {
+
+        UpdatePostDto updatePostDto = new UpdatePostDto(null,
+                "newText",
+                true,
+                new HashSet<>(Arrays.asList(new CategoryDto(10L, "newCategory", "newIcon"))));
+
+        //when title is null
+        Assertions.assertThrows(BadRequestException.class, () -> postService.updatePostById(1L, updatePostDto));
+
+        //when request is null
+        Assertions.assertThrows(BadRequestException.class, () -> postService.updatePostById(1L, null));
+    }
 
 }
