@@ -229,31 +229,55 @@ class PostServiceTest {
     }
 
     @Test
-    void saveLikeOrDislikeForPost() {
+    void sortPostByNumberOfLikesTest() {
+
+
+        Mockito.when(postRepository.sortPostByLikesOrDislikes(Mockito.anyBoolean())).thenReturn(new HashSet<>(Arrays.asList(posts.get(3), posts.get(1), posts.get(0), posts.get(2))));
+        Mockito.when(postMapper.toPostDto(Mockito.any(Post.class))).thenReturn(postDtos.get(3), postDtos.get(1), postDtos.get(0), postDtos.get(2));
+
+        var testValue = postService.sortPostByNumberOfLikes();
+
+        Assertions.assertEquals(testValue.size(), posts.size());
+
+        //most likes
+        Assertions.assertEquals(testValue.get(0).getId(), posts.get(3).getId());
+
+        //least likes
+        Assertions.assertEquals(testValue.get(testValue.size() - 1).getId(), posts.get(2).getId());
     }
 
     @Test
-    void deleteAllPosts() {
+    void sortPostByNumberOfLikesThrowNotFoundExceptionIfListIsNull() {
+        Mockito.when(postRepository.sortPostByLikesOrDislikes(Mockito.anyBoolean())).thenReturn(null);
+
+        Assertions.assertThrows(NotFoundException.class, () -> postService.sortPostByNumberOfLikes());
     }
 
     @Test
-    void sortPostByNumberOfLikes() {
+    void sortPostByNumberOfDislikesTest() {
+
+
+        Mockito.when(postRepository.sortPostByLikesOrDislikes(Mockito.anyBoolean())).thenReturn(new HashSet<>(Arrays.asList(posts.get(3), posts.get(1), posts.get(0), posts.get(2))));
+        Mockito.when(postMapper.toPostDto(Mockito.any(Post.class))).thenReturn(postDtos.get(3), postDtos.get(1), postDtos.get(0), postDtos.get(2));
+
+        var testValue = postService.sortPostByNumberOfDislikes();
+
+        Assertions.assertEquals(testValue.size(), posts.size());
+
+        //least likes
+        Assertions.assertEquals(testValue.get(0).getId(), posts.get(3).getId());
+
+        //most likes
+        Assertions.assertEquals(testValue.get(testValue.size() - 1).getId(), posts.get(2).getId());
+
     }
 
     @Test
-    void sortPostByNumberOfDislikes() {
+    public void sortPostByNumberOfDislikesThrowNotFoundExceptionIfListIsNull() {
+        Mockito.when(postRepository.sortPostByLikesOrDislikes(Mockito.anyBoolean())).thenReturn(null);
+
+        Assertions.assertThrows(NotFoundException.class, () -> postService.sortPostByNumberOfDislikes());
     }
 
-    @Test
-    void filterPostsFromUserProfile() {
-    }
-
-    @Test
-    void getAllPostByCategoryName() {
-    }
-
-    @Test
-    void updatePostById() {
-    }
 
 }
