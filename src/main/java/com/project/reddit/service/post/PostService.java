@@ -12,6 +12,7 @@ import com.project.reddit.kafka.service.generic.NotificationContext;
 import com.project.reddit.mapper.AbstractCategoryMapper;
 import com.project.reddit.mapper.AbstractPostMapper;
 import com.project.reddit.model.content.Post;
+import com.project.reddit.model.user.User;
 import com.project.reddit.repository.PostRepository;
 import com.project.reddit.service.cloudinary.CloudinaryService;
 import com.project.reddit.service.likedislike.PostLikeOrDislikeService;
@@ -24,8 +25,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.lang.reflect.Array;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -115,10 +118,14 @@ public class PostService implements PostInterface, PostCategory{
         if (user.getPosts().stream().anyMatch(item -> item.equals(post.get()))) {
 
             if (post.get().getNotifications().size() > 0) {
-                post.get().getNotifications().forEach(notifier -> notifier.deleteNotificationElement(post.get()));
+                var setToArray = Arrays.copyOf(post.get().getNotifications().toArray(), post.get().getNotifications().size(), User[].class );
+
+                for (int counter = 0; counter < setToArray.length ; counter++) {
+                    setToArray[counter].deleteNotificationElement(post.get());
+                }
+                //post.get().getNotifications().forEach(notifier -> notifier.deleteNotificationElement(post.get()));
             }
 
-            // can delete
             postRepository.deleteById(id);
             log.info("Post deleted");
         }else {

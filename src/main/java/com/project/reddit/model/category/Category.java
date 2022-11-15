@@ -33,4 +33,9 @@ public class Category {
     @JsonIgnore
     private List<Post> posts;
 
+    public Category(Long id, String name, String iconUrl) {
+        this.id = id;
+        this.name = name;
+        this.iconUrl = iconUrl;
+    }
 }

@@ -50,5 +50,22 @@ public class UserProfileDto extends UserAbstract{
         this.postLikeOrDislikeDtos = postLikeOrDislikeDtos;
     }
 
+    public UserProfileDto(Long id, String username, String email, LocalDate createdAt, String imageUrl, List<PostForFrontPageDto> posts, List<UserProfileCommentsWithPostId> commentsPosts, List<LikedOrDislikedCommentsUser> likedOrDislikedComments, List<PostLikeOrDislikeDto> postLikeOrDislikeDtos, Set<FollowDto> followersDtos, Set<FollowDto> followingDtos) {
+        super(id, username, email, createdAt, imageUrl);
+        this.posts = posts;
+        this.commentsPosts = commentsPosts;
+        this.likedOrDislikedComments = likedOrDislikedComments;
+        this.postLikeOrDislikeDtos = postLikeOrDislikeDtos;
+        this.followersDtos = followersDtos;
+        this.followingDtos = followingDtos;
+    }
 
+    public UserProfileDto(List<PostForFrontPageDto> posts, List<UserProfileCommentsWithPostId> commentsPosts, List<LikedOrDislikedCommentsUser> likedOrDislikedComments, List<PostLikeOrDislikeDto> postLikeOrDislikeDtos, Set<FollowDto> followersDtos, Set<FollowDto> followingDtos) {
+        this.posts = posts;
+        this.commentsPosts = commentsPosts;
+        this.likedOrDislikedComments = likedOrDislikedComments;
+        this.postLikeOrDislikeDtos = postLikeOrDislikeDtos;
+        this.followersDtos = followersDtos;
+        this.followingDtos = followingDtos;
+    }
 }
